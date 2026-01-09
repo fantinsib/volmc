@@ -6,23 +6,27 @@ This project aims at implementing the QE scheme from Leif Andersen. The full pap
 
 The Heston model assumes the following SDEs for the dynamics of the underlying asset and its volatility :
 
-$$ \begin{cases}
-dS_t =\mu S_t\space dt + \sqrt{v_t}S_T\space dW_t^{S} \\
+$$
+\begin{cases}
+dS_t = \mu S_t\,dt + \sqrt{v_t}\,S_t\,dW_t^{S}, \\[6pt]
 
+dv_t = \kappa(\theta - v_t)\,dt + \sigma \sqrt{v_t}\,dW_t^{v}, \\[6pt]
 
-dv_t = \kappa(\theta - v_t)dt + \epsilon \sqrt{v_t} dW_t^{v} \\
-
-
-\langle dW_t^{(S)} dW_t^{(v)} \rangle = \rho dt
-\end{cases} $$
+\langle dW_t^{S}, dW_t^{v} \rangle = \rho\,dt.
+\end{cases}
+$$
 
 with : 
 
-$\kappa : \text{Mean-reversion speed}\\$
-$\theta : \text{Long-term variance}\\$
-$\epsilon : \text{Volatility of volatility}\\$
-$\rho : \text{Spot/variance correlation}\\$
-$v_t : \text{Instantaneous variance}\\$
+$\kappa : \text{Mean-reversion speed}$
+
+$\theta : \text{Long-term variance}$
+
+$\epsilon : \text{Volatility of volatility}$
+
+$\rho : \text{Spot/variance correlation}$
+
+$v_t : \text{Instantaneous variance}$
 
 
 A basic approach of simulating a Heston process over discrete time intervals is the log-Euler scheme. 
