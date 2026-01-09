@@ -6,13 +6,13 @@ This project aims at implementing the QE scheme from Leif Andersen. The full pap
 
 The Heston model assumes the following SDEs for the dynamics of the underlying asset and its volatility :
 
-```math
-dS_t = \mu S_t\,dt + \sqrt{v_t}\,S_t\,dW_t^{S}, \\[6pt]
+$$dS_t = \mu S_t\,dt + \sqrt{v_t}\,S_t\,dW_t^{S},$$
 
-dv_t = \kappa(\theta - v_t)\,dt + \epsilon \sqrt{v_t}\,dW_t^{v}, \\[6pt]
 
-\langle dW_t^{S}, dW_t^{v} \rangle = \rho\,dt.
-```
+$$dv_t = \kappa(\theta - v_t)\,dt + \epsilon \sqrt{v_t}\,dW_t^{v},$$
+
+
+$$\langle dW_t^{S}, dW_t^{v} \rangle = \rho\,dt.$$
 
 with : 
 
