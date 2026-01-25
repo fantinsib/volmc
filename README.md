@@ -84,7 +84,7 @@ $$ \lambda = \frac{4\kappa e^{-\kappa(t-s)}}{\epsilon^2(1-e^{-\kappa(t-s)})}$$
 
 and has moments :
 
-$$\Epsilon (X_t | X_s) = \theta + (X_s - \theta)e^{-\kappa(t-s)}$$
+$$E(X_t | X_s) = \theta + (X_s - \theta)e^{-\kappa(t-s)}$$
 
 $$Var(X_t | X_s) = \frac{X_s\space\epsilon^2 e^{-\kappa(t-s)}}{\kappa} \left(1 -e^{-\kappa(t-s)}\right) + \frac{\theta\epsilon^2}{2\kappa}\left(1 -e^{-\kappa(t-s)}\right)^2 $$
 
@@ -92,7 +92,7 @@ $$Var(X_t | X_s) = \frac{X_s\space\epsilon^2 e^{-\kappa(t-s)}}{\kappa} \left(1 -
 
 Andersen offers to approximate $X_t | X_s \sim \chi^{'2}$ through two different regimes. We define the ratio $\psi$ as : 
 
-$$ \psi = \frac{Var(X_t | X_s)}{\Epsilon (X_t | X_s)^{2}}$$
+$$ \psi = \frac{Var(X_t | X_s)}{E(X_t | X_s)^{2}}$$
 
 which measures the relative dispersion of the future variance and serves as the **regime selection criteria**. When $\psi \leq 1.5$, $X_t$ can be approximated by the **quadratic regime** :
 
