@@ -26,7 +26,7 @@ $\rho : \text{Spot/variance correlation}$
 
 $v_t : \text{Instantaneous variance}$
 
-One of the challenge that arises when simulating a Heston process is the passing from continuous to discrete time intervals. While in the $v_t$ process, the Feller condition ($ 2\kappa \theta \ge \epsilon^2$) ensures that $v_t$ stays positive at all $t$, in discrete times nothing holds variance from going negative.
+One of the challenge that arises when simulating a Heston process is the passing from continuous to discrete time intervals. While in the $v_t$ process, the Feller condition ($2\kappa \theta \ge \epsilon^2$) ensures that $v_t$ stays positive at all $t$, in discrete times nothing holds variance from going negative.
 
 
 The objective is therefore to find a numerical scheme that allows to simulate a Heston model, ensuring :
@@ -71,7 +71,8 @@ In ***Efficient Simulation of the Heston Stochastic Volatility Mode*** (2006), L
 
 Andersen starts from the fact that the process followed by volatility in the Heston model is derived from the CIR interest rate model. This model follows a **non-central chi-squared distribution**, noted $\chi^{'2}(\upsilon, \lambda)$ with $\upsilon$ the degree of freedom and $\lambda$ the non-centrality parameter. For a process $X$ that follows :
 
-$$ dX_t = \kappa(\theta - X_t)dt + \sigma \sqrt{X_t} dW_t, $$
+$$dX_t = \kappa(\theta - X_t)dt + \sigma \sqrt{X_t} dW_t$$
+
 the R.V $X_t \space | \space X_s$ for $t>s$ therefore follows :
 
 $$ X_t \sim c\space\chi^{'2}(\upsilon, \lambda) $$
