@@ -30,7 +30,7 @@ public:
     /**
      * @brief Simulates the scheme over a specified time interval
      * 
-     * @param S0 the initial price
+     * @param S0 the initial spot
      * @param n the number of steps 
      * @param T the time horizon
      * @param v0 optional initial volatility 

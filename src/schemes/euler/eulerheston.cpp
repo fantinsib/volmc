@@ -19,11 +19,14 @@ State EulerHeston::init_state(float S0, std::optional<float> v0) const {
     return state;
 }
 
+
+
 State EulerHeston::step(const State& state, 
                         float dt, 
                         std::mt19937& rng) const 
                         
 {
+    if (dt <= 0) throw std::invalid_argument("EulerBlackScholes::step : dt must be stricltly positive");
     float logS = std::log(state.spot());
     
     if (!state.vol().has_value()) throw std::logic_error("EulerHeston::step : no value found for V in State");

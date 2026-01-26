@@ -18,14 +18,34 @@ class EulerHeston : public Scheme
 {
 
     public:
+    //constructor
     EulerHeston(Heston model):
     model(model)
     {};
 
     Heston model;
 
+    /**
+    * @brief Creates the initial state at time 0
+    * 
+    *
+    * @param S0 the spot at time 0
+    * @param v0 optional : the volatility at time 0 - required for Heston 
+    * 
+    * @return State : a State object representing the initial state
+    */
     State init_state(float S0, std::optional<float> v0) const override;
 
+    /**
+    * @brief Generates a new Heston spot value and volatility level 
+    * using a log-Euler discretization
+    * 
+    *
+    * @param state current state
+    * @param dt the time step
+    * @param rng the random number generator
+    * @return State : a State object containing the new spot price
+    */
     State step(const State& state, float dt, std::mt19937& rng) const override;
 
 };

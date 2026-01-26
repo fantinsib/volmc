@@ -13,8 +13,16 @@
  * 
  */
 struct Path{
+public:
 
-    std::vector<State> states;
+    using iterator = std::vector<State>::iterator;
+    using const_iterator = std::vector<State>::const_iterator;
+
+    iterator begin() {return states.begin();}
+    iterator end() {return states.end();}
+
+    const_iterator begin() const {return states.begin();}
+    const_iterator end() const {return states.end();}
 
     State end_state() {return states.back();}
     float size() {return states.size();}
@@ -24,6 +32,9 @@ struct Path{
     void set_step(State state, int i) {
         states[i] = state;
     }
+
+private:
+    std::vector<State> states;
 };
 
 
