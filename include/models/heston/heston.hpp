@@ -1,3 +1,5 @@
+#pragma once
+
 #include "models/model.hpp"
 #include <stdexcept>
 

@@ -8,11 +8,8 @@ struct State {
     std::optional<float> v = std::nullopt;
 
     float spot() const {return S;}
-    float vol() {
-        if (v.has_value()) {
-            return v.value();
-        }
-        else return -1; 
+    std::optional<float> vol() const {
+        return v;
 }
 
 };
