@@ -16,7 +16,7 @@ target_link_libraries(quadratic_exponential_tests
 )
 
 target_include_directories(quadratic_exponential_tests
-    PRIVATE ${PROJECT_SOURCE_DIR}/src
+    PRIVATE ${PROJECT_SOURCE_DIR}/include
 )
 
 add_test(

@@ -1,49 +1,85 @@
-####################################################
-#       ROOT CMAKE
-####################################################
-
 cmake_minimum_required(VERSION 3.20)
 project(quadratic_exponential LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_library(quadratic_exponential
-            src/schemes/qe/qe.cpp
-            src/schemes/euler/eulerblackscholes.cpp
-            src/schemes/euler/eulerheston.cpp
-            src/engine/montecarlo.cpp)
+include(FetchContent)
 
-target_include_directories(quadratic_exponential
+# ----------------------------
+# Core library
+# ----------------------------
+add_library(volmc
+    src/schemes/qe/qe.cpp
+    src/schemes/euler/eulerblackscholes.cpp
+    src/schemes/euler/eulerheston.cpp
+    src/engine/montecarlo.cpp
+)
+
+target_include_directories(volmc
     PUBLIC
         ${PROJECT_SOURCE_DIR}/include
 )
 
-target_compile_options(quadratic_exponential PRIVATE -Wall -Wextra -Wpedantic)
+# PIC helps when linking into a python module (safe default)
+set_target_properties(volmc PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
-include(FetchContent)
+# Warnings (portable-ish)
+if (MSVC)
+    target_compile_options(volmc PRIVATE /W4)
+else()
+    target_compile_options(volmc PRIVATE -Wall -Wextra -Wpedantic)
+endif()
 
+# ----------------------------
+# Catch2 (tests)
+# ----------------------------
 FetchContent_Declare(
     Catch2
     GIT_REPOSITORY https://github.com/catchorg/Catch2.git
     GIT_TAG v3.5.0
 )
-
 FetchContent_MakeAvailable(Catch2)
-
 
 enable_testing()
 
-add_executable(quadratic_exponential_tests
+add_executable(volmc_tests
     tests/test_cpp/test_models.cpp
     tests/test_cpp/test_schemes/test_euler.cpp
     tests/test_cpp/test_engine/test_montecarlo.cpp
 )
 
-target_link_libraries(quadratic_exponential_tests
+target_link_libraries(volmc_tests
     PRIVATE
-        quadratic_exponential
+        volmc
         Catch2::Catch2WithMain
 )
 
-add_test(NAME quadratic_exponential_tests COMMAND quadratic_exponential_tests)
+target_include_directories(volmc_tests
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/include
+)
+
+add_test(NAME volmc_tests COMMAND volmc_tests)
+
+# ----------------------------
+# pybind11 module
+# ----------------------------
+cmake_policy(SET CMP0148 NEW)
+
+find_package(Python REQUIRED COMPONENTS Interpreter Development)
+
+FetchContent_Declare(
+    pybind11
+    GIT_REPOSITORY https://github.com/pybind/pybind11.git
+    GIT_TAG v2.11.1
+)
+FetchContent_MakeAvailable(pybind11)
+
+pybind11_add_module(_volmc
+    
+    #src/bindings/montecarlo_bindings.cpp
+    src/bindings/bindings.cpp
+)
+
+target_link_libraries(_volmc PRIVATE volmc)
