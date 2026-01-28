@@ -5,5 +5,7 @@
  * 
  */
 
-struct Model{};
+struct Model{
+
+};
 

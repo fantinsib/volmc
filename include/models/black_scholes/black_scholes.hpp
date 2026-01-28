@@ -22,4 +22,5 @@ struct BlackScholes : Model {
 
     float mu; 
     float sigma; 
+
 };

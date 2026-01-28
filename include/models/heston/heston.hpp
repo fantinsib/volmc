@@ -30,7 +30,7 @@ struct Heston : Model {
 
     bool feller_condition() {return feller;}
 
-    private:
-
+private:
     bool feller;
+
 };

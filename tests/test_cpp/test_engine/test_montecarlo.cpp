@@ -16,6 +16,7 @@
 #include "schemes/eulerheston.hpp"
 #include "schemes/qe.hpp"
 #include "engine/montecarlo.hpp"
+#include "types/simulationresult.hpp"
 
 
 
@@ -25,12 +26,29 @@ TEST_CASE("Monte Carlo - BlackScholes & Euler - basic usage"){
     EulerBlackScholes eu_scheme(bs);
     MonteCarlo mc(eu_scheme);
 
-    mc.set_seed(1);
+    mc.configure(1);
 
-    Path simulation= mc.simulate_path(100, 252, 1);
+    Path simulation = mc.simulate_path(100, 252, 1);
+    SimulationResult results = mc.generate(100, 252, 1, 10);
+    
 
-    REQUIRE(simulation.size() == 252);
+    REQUIRE(simulation.size() == 253);
     REQUIRE(simulation.end_state().spot() != 100);
+    REQUIRE(results.get_npaths() == 10);
+    REQUIRE(results.get_npaths() == results.pathbundle->n_paths);
+    REQUIRE(results.n_steps == 252);
+    REQUIRE(results.n_steps == results.pathbundle->n_steps);
+    REQUIRE(results.get_seed() == 1);
+
+    std::vector<float> spots = results.pathbundle->unravel_spot();
+    REQUIRE(spots[0]== 100.0f);
+    for (float i : spots){
+        REQUIRE(i > 0);
+    }
+        
+
+
+
 
 }
 
@@ -42,19 +60,19 @@ TEST_CASE("Monte Carlo - BlackScholes & Euler - Randomness"){
     MonteCarlo mc2(eu_scheme);
     MonteCarlo mc3(eu_scheme);
 
-    mc1.set_seed(1);
-    mc2.set_seed(1);
-    mc3.set_seed(2);
+    mc1.configure(1);
+    mc2.configure(1);
+    mc3.configure(2);
 
     Path simulation1= mc1.simulate_path(100, 252, 1);
     Path simulation2= mc2.simulate_path(100, 252, 1);
     Path simulation3= mc3.simulate_path(100, 252, 1);
 
-    REQUIRE(simulation1.size() == 252);
+    REQUIRE(simulation1.size() == 253);
     REQUIRE(simulation1.end_state().spot() != 100);
-    REQUIRE(simulation2.size() == 252);
+    REQUIRE(simulation2.size() == 253);
     REQUIRE(simulation2.end_state().spot() != 100);
-    REQUIRE(simulation3.size() == 252);
+    REQUIRE(simulation3.size() == 253);
     REQUIRE(simulation3.end_state().spot() != 100);
 
     REQUIRE(mc1.get_seed() == 1);
@@ -74,11 +92,11 @@ TEST_CASE("Monte Carlo - Heston & Euler - basic usage"){
     EulerHeston eu_scheme(heston);
     MonteCarlo mc(eu_scheme);
 
-    mc.set_seed(1);
+    mc.configure(1);
 
     Path simulation= mc.simulate_path(100, 252, 1, 0.2);
 
-    REQUIRE(simulation.size() == 252);
+    REQUIRE(simulation.size() == 253);
     REQUIRE(simulation.end_state().spot() != 100);
 
 }
@@ -92,19 +110,19 @@ TEST_CASE("Monte Carlo - Heston & Euler - Randomness"){
     MonteCarlo mc2(eu_scheme);
     MonteCarlo mc3(eu_scheme);
 
-    mc1.set_seed(1);
-    mc2.set_seed(1);
-    mc3.set_seed(2);
+    mc1.configure(1);
+    mc2.configure(1);
+    mc3.configure(2);
 
     Path simulation1= mc1.simulate_path(100, 252, 1, 0.2);
     Path simulation2= mc2.simulate_path(100, 252, 1, 0.2);
     Path simulation3= mc3.simulate_path(100, 252, 1, 0.2);
 
-    REQUIRE(simulation1.size() == 252);
+    REQUIRE(simulation1.size() == 253);
     REQUIRE(simulation1.end_state().spot() != 100);
-    REQUIRE(simulation2.size() == 252);
+    REQUIRE(simulation2.size() == 253);
     REQUIRE(simulation2.end_state().spot() != 100);
-    REQUIRE(simulation3.size() == 252);
+    REQUIRE(simulation3.size() == 253);
     REQUIRE(simulation3.end_state().spot() != 100);
 
     REQUIRE(mc1.get_seed() == 1);
@@ -124,11 +142,11 @@ TEST_CASE("Monte Carlo - QE - basic usage"){
     QE qe(heston);
     MonteCarlo mc(qe);
 
-    mc.set_seed(1);
+    mc.configure(1);
 
     Path simulation= mc.simulate_path(100, 252, 1, 0.2);
 
-    REQUIRE(simulation.size() == 252);
+    REQUIRE(simulation.size() == 253);
     REQUIRE(simulation.end_state().spot() != 100);
 
 }
@@ -142,19 +160,19 @@ TEST_CASE("Monte Carlo - QE - Randomness"){
     MonteCarlo mc2(qe);
     MonteCarlo mc3(qe);
 
-    mc1.set_seed(1);
-    mc2.set_seed(1);
-    mc3.set_seed(2);
+    mc1.configure(1);
+    mc2.configure(1);
+    mc3.configure(2);
 
     Path simulation1= mc1.simulate_path(100, 252, 1, 0.2);
     Path simulation2= mc2.simulate_path(100, 252, 1, 0.2);
     Path simulation3= mc3.simulate_path(100, 252, 1, 0.2);
 
-    REQUIRE(simulation1.size() == 252);
+    REQUIRE(simulation1.size() == 253);
     REQUIRE(simulation1.end_state().spot() != 100);
-    REQUIRE(simulation2.size() == 252);
+    REQUIRE(simulation2.size() == 253);
     REQUIRE(simulation2.end_state().spot() != 100);
-    REQUIRE(simulation3.size() == 252);
+    REQUIRE(simulation3.size() == 253);
     REQUIRE(simulation3.end_state().spot() != 100);
 
     REQUIRE(mc1.get_seed() == 1);
@@ -173,11 +191,11 @@ TEST_CASE("Monte Carlo - QE - V > 0"){
     QE qe(heston);
     MonteCarlo mc(qe);
 
-    mc.set_seed(1);
+    mc.configure(1);
 
     Path simulation= mc.simulate_path(100, 1000, 1, 0.2);
 
-    REQUIRE(simulation.size() == 1000);
+    REQUIRE(simulation.size() == 1001);
     
     for (State s : simulation){
         REQUIRE(s.vol().has_value());

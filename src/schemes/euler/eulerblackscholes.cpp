@@ -28,7 +28,7 @@ State EulerBlackScholes::step(const State& state, float dt, std::mt19937& rng) c
     
     float logS = std::log(state.spot());
     float Z = dist(rng);
-    float logSt = logS + (model.mu - 0.5*model.sigma*model.sigma)*dt + model.sigma*Z;
+    float logSt = logS + (model.mu - 0.5*model.sigma*model.sigma)*dt + model.sigma*Z * std::sqrt(dt);
 
     return State{std::exp(logSt)};
 }

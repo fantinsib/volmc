@@ -25,7 +25,9 @@ void bind_engine(py::module_& m) {
             py::arg("n"),
             py::arg("T"),
             py::arg("n_paths"),
-            py::arg("v0") = py::none()
+            py::arg("v0") = py::none())
+        .def("_configure", &MonteCarlo::configure,
+            py::arg("seed")
         );
 }
 

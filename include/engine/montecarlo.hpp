@@ -70,13 +70,11 @@ public:
     SimulationResult generate(float S0, size_t n, float T, size_t n_path, std::optional<float> v0 = std::nullopt);
     
     /**
-     * @brief Changes the seed of the MonteCarlo engine
+     * @brief Method allowing to configure the engine 
      * 
-     * @param s the new seed 
+     * @param seed : the seed to be used for the generation
      */
-    void set_seed(int s){
-        seed_ = s;
-        rng_.seed(s);}
+    void configure(std::optional<int> seed);
     
     //returns the current seed
     int get_seed() {return seed_;}
@@ -86,6 +84,7 @@ public:
 
     size_t seed_;
     std::mt19937 rng_;
+    bool v_simulated_;
 
     
 };
