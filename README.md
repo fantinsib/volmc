@@ -33,8 +33,13 @@ Schemes describe how to discretize a model at each time step.
 The engine in charge of generating the paths
 
 - `MonteCarlo`
-    - `.simulate_path()`: returns a single path for the asset.
     - `.generate()` : returns a specified number of paths. 
+        - `S0` initial spot value
+        - `v0` optional initial variance value for Heston model
+        - `n` the number of steps in each path
+        - `T` the time period of generation
+        - `n_paths` the number of paths to generate
+    - `.configure()` : use to set the seed of the engine and the `n_jobs` parameter for the number of CPU cores to use (-1 for maximum)
 
 ## Quick Demo
 
@@ -45,7 +50,7 @@ from volmc import Heston, QE, MonteCarlo, SimulationResult
 
 heston = Heston(mu=0.02, 
                 kappa=2, 
-                theta= 0.1, 
+                theta= 0.05, 
                 epsilon=0.3, 
                 rho = -0.6)
 
@@ -55,7 +60,7 @@ mc = MonteCarlo(QE(heston))
 mc.configure(seed=1, n_jobs = -1)
 
 sim = mc.generate(S0 = 100, 
-                  v0 = 0.15, 
+                  v0 = 0.04, 
                   n = 252, 
                   T = 1, 
                   n_paths = 500_000)

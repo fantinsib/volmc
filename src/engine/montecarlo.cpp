@@ -69,16 +69,16 @@ SimulationResult MonteCarlo::generate(float S0,
 void MonteCarlo::configure(std::optional<int> seed, std::optional<int> n_jobs){
 
     if (seed.has_value()) {
-        if (seed.value()<0) throw std::invalid_argument("MonteCarlo::configure : seed value must be strictly positive");
+        if (seed.value()<0) throw std::invalid_argument("MonteCarlo::configure : seed value must be positive");
         seed_ = static_cast<size_t>(seed.value());
         rng_.seed(seed_);
     }
 
     if (n_jobs.has_value()) {
-        int hw = std::thread::hardware_concurrency();
+        int hw = static_cast<int>(std::thread::hardware_concurrency());
         hw = (hw == 0 ? 1 : hw); 
         if (n_jobs.value() < -1 || n_jobs.value() == 0) throw std::invalid_argument("MonteCarlo::configure : n_jobs value must be strictly positive or equal to -1");
-        if (n_jobs.value() > hw) n_jobs_ = hw;
+        if (n_jobs.value() > hw || n_jobs.value() == -1) n_jobs_ = hw;
         else (n_jobs_ = n_jobs.value());
     }
 }
