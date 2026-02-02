@@ -16,6 +16,7 @@ add_library(volmc
     src/engine/montecarlo.cpp
     src/types/date.cpp
     src/types/simulationresult.cpp
+    src/options/optioncontract.cpp
 )
 
 target_include_directories(volmc
@@ -52,6 +53,7 @@ add_executable(volmc_tests
     tests/test_cpp/test_engine/test_montecarlo.cpp
     tests/test_cpp/test_types/test_date.cpp
     tests/test_cpp/test_types/test_simulationresult.cpp
+    tests/test_cpp/test_options/test_europeanoptions.cpp
 )
 
 target_link_libraries(volmc_tests

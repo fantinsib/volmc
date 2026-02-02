@@ -1,14 +1,16 @@
+#pragma once
+
+#include "options.hpp"
+
+
+class EuropeanOption : public Option {};
 
 
 
-class EuropeanOption {};
+class EuropeanCall : public EuropeanOption {};
 
 
-
-class EuropeanCall : EuropeanOption {};
-
-
-class EuropeanPut : EuropeanOption {};
+class EuropeanPut : public EuropeanOption {};
 
 
 
