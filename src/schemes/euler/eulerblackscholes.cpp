@@ -20,7 +20,7 @@ State EulerBlackScholes::init_state(float S0,  std::optional<float> v0) const {
 }
 
 
-State EulerBlackScholes::step(const State& state, float dt, std::mt19937& rng) const {
+State EulerBlackScholes::step(const State& state, int i, float dt, std::mt19937& rng) const {
 
     if (dt <= 0) throw std::invalid_argument("EulerBlackScholes::step : dt must be stricltly positive");
 

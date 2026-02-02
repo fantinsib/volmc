@@ -42,10 +42,11 @@ class EulerBlackScholes : public Scheme
     * with Z ~ N(0,1).
     *
     * @param state current state
+    * @param i the current step of the generation process
     * @param dt the time step
     * @param rng the random number generator
     * @return State : a State object containing the new spot price
     */
-    State step(const State& state, float dt, std::mt19937& rng) const override;
+    State step(const State& state, int i, float dt, std::mt19937& rng) const override;
 
 };

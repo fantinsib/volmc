@@ -1,4 +1,4 @@
-#include "models/dupire.hpp"
+#include "models/dupire/dupire.hpp"
 
 #include "surface/local_vol.hpp"
 
@@ -8,6 +8,5 @@ Dupire::Dupire(float r, float q,
            r_(r), q_(q), lv_surface_(loc_vol_surface)
 
 {}
-
 
 

@@ -7,7 +7,7 @@
 
 #include <memory>
 
-struct Dupire : Model {
+struct Dupire : public Model {
 
 public:
     /**
@@ -20,10 +20,13 @@ public:
     Dupire(float r, float q, 
            std::shared_ptr<LocalVolatilitySurface> loc_vol_surface);
 
-
+    double sigma(float t, float S) const {return lv_surface_->sigma(t, S);}
+    double drift() const {return r_ - q_;}
+    
 private:
     float r_; 
     float q_;
+    
 
     std::shared_ptr<LocalVolatilitySurface> lv_surface_;
 

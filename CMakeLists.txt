@@ -12,8 +12,10 @@ include(FetchContent)
 add_library(volmc
     src/schemes/qe/qe.cpp
     src/schemes/euler/eulerblackscholes.cpp
+    src/schemes/euler/eulerdupire.cpp
     src/schemes/euler/eulerheston.cpp
     src/engine/montecarlo.cpp
+    src/models/dupire.cpp
     src/types/date.cpp
     src/types/simulationresult.cpp
     src/options/optioncontract.cpp

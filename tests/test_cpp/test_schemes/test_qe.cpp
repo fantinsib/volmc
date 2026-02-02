@@ -25,7 +25,7 @@ TEST_CASE("Scheme - QE"){
     float dt = 0.1;
     State init{100, 0.2};
 
-    State S{qe.step(init, dt, rng)};
+    State S{qe.step(init, 0, dt, rng)};
     REQUIRE(S.spot());
     }
 
@@ -38,7 +38,7 @@ TEST_CASE("Scheme - QE"){
     float dt = 0.1;
     State init{100, 0.2};
 
-    State S{qe.step(init, dt, rng)};
+    State S{qe.step(init, 0, dt, rng)};
     REQUIRE(S.spot());
     }
 
@@ -84,7 +84,7 @@ TEST_CASE("Scheme - QE"){
         float dt = 0.1;
         State init{100};
 
-        REQUIRE_THROWS_AS(qe.step(init, dt, rng), std::invalid_argument);
+        REQUIRE_THROWS_AS(qe.step(init, 0, dt, rng), std::invalid_argument);
     }
 
 }

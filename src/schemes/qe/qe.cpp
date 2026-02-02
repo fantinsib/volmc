@@ -32,6 +32,7 @@ State QE::init_state(float S0, std::optional<float> v0) const {
 
 
 State QE::step(const State& state, 
+                        int i, 
                         float dt, 
                         std::mt19937& rng) const 
 {

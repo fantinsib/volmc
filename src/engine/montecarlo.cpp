@@ -29,7 +29,7 @@ Path MonteCarlo::simulate_path(float S0,
 
     for (size_t step = 0; step < n; step ++){
 
-        state = scheme_->step(state, dt, rng);
+        state = scheme_->step(state, step, dt, rng);
         path.set_step(state, step+1);
     }
 

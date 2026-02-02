@@ -10,14 +10,18 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>  
+#include <memory>
 #include <random>
 #include "models/black_scholes/black_scholes.hpp"
 #include "models/heston/heston.hpp"
+#include "models/dupire/dupire.hpp"
 #include "schemes/eulerblackscholes.hpp"
 #include "schemes/eulerheston.hpp"
+#include "schemes/eulerdupire.hpp"
 #include "schemes/qe.hpp"
 #include "engine/montecarlo.hpp"
 #include "types/simulationresult.hpp"
+#include "surface/local_vol.hpp"
 
 
 
@@ -219,6 +223,34 @@ TEST_CASE("Monte Carlo - Parallelism") {
     EulerHeston qe(heston);
     
     MonteCarlo mc(qe);
+
+    mc.configure(1, -1);
+    
+    SimulationResult res = mc.generate(100, 252,1, 20, 0.2);
+
+    REQUIRE(res.avg_terminal_value() != 100);
+    REQUIRE(res.get_npaths() == 20);
+    REQUIRE(res.get_nsteps() == 252);
+}
+
+
+TEST_CASE("Dupire - Basic Usage") {
+
+    std::vector<double> t {1,2,3, 4};
+    std::vector<double> s {100,200,300};
+    std::vector<double> vol{0.20, 0.19, 0.21,   
+                            0.22, 0.20, 0.23,   
+                            0.25, 0.24, 0.26,
+                            0.27, 0.28, 0.29};
+
+    LocalVolatilitySurface surface(t, s, vol);
+    
+    
+
+    Dupire dupire(0.05, 0.02, std::make_shared<LocalVolatilitySurface>(surface));
+    EulerDupire eu_dupire(dupire);
+    
+    MonteCarlo mc(eu_dupire);
 
     mc.configure(1, -1);
     

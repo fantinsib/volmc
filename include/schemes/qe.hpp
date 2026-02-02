@@ -19,7 +19,17 @@ public:
     explicit QE(const Heston& model, float psi_threshold = 1.5f);
 
     State init_state(float S0, std::optional<float> v0) const override;
-    State step(const State& state, float dt, std::mt19937& rng) const override;
+    /**
+     * @brief Generates a new Heston spot value and volatility level 
+     * using a Quadratic Exponential discretization
+     * 
+     * @param state current state
+     * @param i the current step of the generation process
+     * @param dt the time step
+     * @param rng the random number generator
+     * @return State : a State object containing the new spot price
+     */
+    State step(const State& state, int i, float dt, std::mt19937& rng) const override;
 
     float psi_c() const {return psi_threshold_;}
     void set_psi_c(float p);

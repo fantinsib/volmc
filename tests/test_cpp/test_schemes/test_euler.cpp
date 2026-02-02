@@ -30,7 +30,7 @@ SECTION("Constructor") {
     float dt = 0.1;
     State init{100};
 
-    State S{euler_bs.step(init, dt, rng)};
+    State S{euler_bs.step(init, 0, dt, rng)};
     REQUIRE(S.spot());
 }
 
@@ -50,8 +50,8 @@ SECTION("Invalid dt") {
     std::mt19937 rng;
     State init{100};
 
-    REQUIRE_THROWS_AS(euler_bs.step(init, 0.0f, rng), std::invalid_argument);
-    REQUIRE_THROWS_AS(euler_bs.step(init, -0.1f, rng), std::invalid_argument);
+    REQUIRE_THROWS_AS(euler_bs.step(init, 0, 0.0f, rng), std::invalid_argument);
+    REQUIRE_THROWS_AS(euler_bs.step(init, 0, -0.1f, rng), std::invalid_argument);
 }
 }
 
@@ -66,7 +66,7 @@ TEST_CASE("Scheme - EulerHeston") {
         float dt = 0.1;
         State init{100, 0.2};
         
-        State S{euler_heston.step(init, dt, rng)};
+        State S{euler_heston.step(init, 0,  dt, rng)};
         REQUIRE(S.spot());
         REQUIRE(S.vol().has_value());
 
@@ -81,7 +81,7 @@ TEST_CASE("Scheme - EulerHeston") {
         float dt = 0.1;
         State init{100};
         
-        REQUIRE_THROWS_AS(euler_heston.step(init, dt, rng), std::logic_error);
+        REQUIRE_THROWS_AS(euler_heston.step(init, 0, dt, rng), std::logic_error);
 
     }
 
@@ -102,8 +102,8 @@ TEST_CASE("Scheme - EulerHeston") {
         std::mt19937 rng;
         State init{100, 0.2};
 
-        REQUIRE_THROWS_AS(euler_heston.step(init, 0.0f, rng), std::invalid_argument);
-        REQUIRE_THROWS_AS(euler_heston.step(init, -0.1f, rng), std::invalid_argument);
+        REQUIRE_THROWS_AS(euler_heston.step(init, 0, 0.0f, rng), std::invalid_argument);
+        REQUIRE_THROWS_AS(euler_heston.step(init, 0, -0.1f, rng), std::invalid_argument);
     }
 
 }
