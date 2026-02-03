@@ -218,7 +218,7 @@ def test_mc_dupire():
 
     mc = MonteCarlo(euler_dupire)
 
-    sim = mc.generate(100, 252, 1, 10, 0.1)
+    sim = mc.generate(100, 252, 1, 10)
 
     assert(isinstance(sim, SimulationResult))
     assert(sim.mean_terminal_spot() != 100)
