@@ -36,9 +36,15 @@ double LocalVolatilitySurface::sigma(double t, double S) const{
 
     size_t nS = spots_.size();
     size_t nt = times_.size();
+ 
+    double S_clamped = std::clamp(S, spots_.front(), spots_.back());
+    double t_clamped = std::clamp(t, times_.front(), times_.back());
 
-    size_t low_S_idx = get_l_bound_index(spots_, S);
-    size_t low_t_idx = get_l_bound_index(times_, t);
+    size_t low_S_idx = get_l_bound_index(spots_, S_clamped);
+    size_t low_t_idx = get_l_bound_index(times_, t_clamped);
+
+    low_S_idx = std::min(low_S_idx, nS -2);
+    low_t_idx = std::min(low_t_idx, nt -2);
 
     double S0 = spots_[low_S_idx];
     double t0 = times_[low_t_idx];
@@ -46,8 +52,11 @@ double LocalVolatilitySurface::sigma(double t, double S) const{
     double S1 = spots_[low_S_idx+1];
     double t1 = times_[low_t_idx+1];
     
-    const double wt = (t1 == t0) ? 0.0 : (t - t0) / (t1 - t0);
-    const double wS = (S1 == S0) ? 0.0 : (S - S0) / (S1 - S0);
+    double wt = (t1 == t0) ? 0.0 : (t_clamped - t0) / (t1 - t0);
+    double wS = (S1 == S0) ? 0.0 : (S_clamped- S0) / (S1 - S0);
+
+    wt = std::clamp(wt, 0.0, 1.0);
+    wS = std::clamp(wS, 0.0, 1.0);
 
     auto at = [&](size_t ii, size_t jj) {
         return loc_vol_[ii * nS + jj]; // row-major par temps
@@ -60,7 +69,9 @@ double LocalVolatilitySurface::sigma(double t, double S) const{
 
     const double v0 = (1.0 - wS) * v00 + wS * v01;
     const double v1 = (1.0 - wS) * v10 + wS * v11;
-    return (1.0 - wt) * v0 + wt * v1;
+    double sigma = (1.0 - wt) * v0 + wt * v1;
+
+    return sigma;
 
 };
 

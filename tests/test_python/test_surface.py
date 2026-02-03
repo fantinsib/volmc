@@ -47,8 +47,8 @@ def test_local_vol_surface_interp_oob():
     
     loc_vol = LocalVolatilitySurface(t,s,v)
 
-    assert(loc_vol.sigma(0.2, 130)==0.35)
-    assert(loc_vol.sigma(1.2, 120)==0.24)
+    assert(loc_vol.sigma(0.2, 130)==0.3)
+    assert(loc_vol.sigma(1.2, 120)==0.25)
 
 def test_local_vol_surface_error_wrong_dim_v():
     

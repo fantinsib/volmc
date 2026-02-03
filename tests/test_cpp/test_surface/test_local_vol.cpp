@@ -72,13 +72,13 @@ TEST_CASE("Local Volatility Surface - Interpolation") {
     SECTION("Out of bounds - S"){
 
         double sigma = surface.sigma(0.8, 120);
-        REQUIRE(sigma == Catch::Approx(0.28));
+        REQUIRE(sigma == Catch::Approx(0.26));
     }
         
     SECTION("Out of bounds - t"){
 
         double sigma = surface.sigma(1.1, 110);
-        REQUIRE(sigma == Catch::Approx(0.29));
+        REQUIRE(sigma == Catch::Approx(0.26));
     }
 
 }
