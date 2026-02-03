@@ -94,6 +94,7 @@ pybind11_add_module(_volmc
   src/bindings/models_bindings.cpp
   src/bindings/schemes_bindings.cpp
   src/bindings/engines_bindings.cpp
+  src/bindings/surface_bindings.cpp
 )
 
 

@@ -2,6 +2,7 @@
 #include <pybind11/stl.h>
 #include <optional>
 #include "models/black_scholes/black_scholes.hpp"
+#include "models/dupire/dupire.hpp"
 #include "models/heston/heston.hpp"
 #include "models/model.hpp"
 
@@ -29,6 +30,12 @@ void bind_models(py::module_& m) {
 
         .def("_feller_condition", &Heston::feller_condition);
 
+    /*
+    py::class_<Dupire>(m, "_Dupire")
+        .def(py::init<float, float,  >(),
+            py::arg("mu"),
+            py::arg("sigma"));
+*/
 }
 
 } // namespace qe::pybind

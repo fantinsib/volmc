@@ -1,9 +1,16 @@
+from __future__ import annotations
 from ._volmc import _State
 from ._volmc import _Path
 from ._volmc import _Model, _BlackScholes, _Heston
 from ._volmc import _EulerHeston, _EulerBlackScholes, _QE, _Scheme
 from ._volmc import _MonteCarlo
+from ._volmc import _LocalVolatilitySurface
 
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import numpy
 
 #--------------------------------types
 
@@ -246,3 +253,40 @@ class MonteCarlo(_MonteCarlo):
             The seed to be used for randomness
         """
         self._configure(seed, n_jobs)
+
+
+class LocalVolatilitySurface(_LocalVolatilitySurface):
+    def __init__(self, 
+                times : numpy.ndarray, 
+                spots : numpy.ndarray, 
+                volatility : numpy.ndarray):
+        """
+        Creates a local volatility surface.
+
+        Parameters
+        ----------
+        times : numpy.ndarray
+            The vector of times in years of the surface
+        spots : numpy.ndarray
+            The vector of spots of the surface
+        volatility : the times * spots matrix of corresponding local volatilities
+        """
+        return super().__init__(times, spots, volatility)
+    
+    def sigma(self, t : float, S : float):
+        """
+        Computes the interpolated local volatility at time t for spot S.
+
+        Parameters
+        ----------
+        t : float
+            Time in years.
+        S : float
+            Spot price.
+
+        Returns
+        -------
+        float 
+            The interpolated local volatility
+        """
+        return self._sigma(t, S)
