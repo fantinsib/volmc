@@ -163,7 +163,7 @@ class Heston(_Heston):
         return self._feller_condition()
     
 class Dupire(_Dupire):
-    def __init__(self, r : float, q : float, loc_vol_surface : LocalVolatilitySurface):
+    def __init__(self, r : float, q : float, local_volatility_surface : LocalVolatilitySurface):
         """
         Creates a Dupire model.
 
@@ -176,7 +176,7 @@ class Dupire(_Dupire):
         loc_vol_surface : LocalVolatilitySurface
             The local volatility surface.
         """
-        return super().__init__(r, q, loc_vol_surface)
+        return super().__init__(r, q, local_volatility_surface)
     
 #--------------------------------SCHEMES
 

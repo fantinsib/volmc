@@ -18,7 +18,11 @@ The Model class represents the parameters for the stochastic dynamic.
     - `kappa` : mean-reversion speed
     - `theta` : long-term variance
     - `epsilon` : vol-of-vol
-    - `rho` : spot/vol brownian correlation            
+    - `rho` : spot/vol brownian correlation
+- Dupire model (`Dupire`)            
+    - `r` : the risk-free rate
+    - `q` : the dividend yield
+    - `local_volatility_surface` : the local volatility surface as a `LocalVolatilitySurface` instance 
 
 **`Schemes`**
 
@@ -26,6 +30,7 @@ Schemes describe how to discretize a model at each time step.
 
 - Black-Scholes exact log discretization (`EulerBlackScholes`)
 - Heston Euler-type discretization with full truncation (`EulerHeston`)
+- Dupire discretization (`EulerDupire`)
 - Quadratic Exponential (`QE`)
 
 **`Engine`** 
@@ -41,7 +46,7 @@ The engine in charge of generating the paths
         - `n_paths` the number of paths to generate
     - `.configure()` : use to set the seed of the engine and the `n_jobs` parameter for the number of CPU cores to use (-1 for maximum)
 
-## Quick Demo
+## Basic Demo
 
 A demo notebook is available [here](doc/demo_notebook.ipynb).
 
