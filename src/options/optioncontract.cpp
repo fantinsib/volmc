@@ -1,18 +1,14 @@
 
-#include "options/optioncontract.hpp"
 #include "options/options.hpp"
 #include <memory>
 #include <stdexcept>
 
 
-OptionContract::OptionContract(float K, 
-                               float T, 
-                               std::shared_ptr<Option> option_type, 
-                               std::optional<Date> date_) :
-
-                               K(K), T(T),option_type(option_type), date(date_)
-
-
+OptionContract::OptionContract(double K, 
+                               double T) :
+                               K(K), 
+                               T(T)
+                            
 {   
     if (K<0) 
         throw std::invalid_argument("OptionContract constructor : value for K cannot be negative");

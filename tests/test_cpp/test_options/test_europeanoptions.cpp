@@ -5,13 +5,16 @@
 #include <optional>
 #include <stdexcept>
 
-#include "options/europeanoptions.hpp"
-#include "options/optioncontract.hpp"
-
+#include "options/options.hpp"
+#include "payoff/payoff.h"
+#include "instruments/instrument.h"
 
 
 TEST_CASE("European option - basic construction"){
 
-    auto call = std::make_shared<EuropeanCall>();
-    OptionContract my_option(105, 1, call);
+    double K = 105;
+    OptionContract contract(K, 0.8);
+    
+    Instrument european_call(contract, std::make_unique<CallPayoff>(K));
+    
 }
