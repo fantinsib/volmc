@@ -6,6 +6,7 @@ qe_tests.ipynb
 
 .DS_Store
 
+*.so
 *.egg-info
 
 launch.json

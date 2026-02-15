@@ -16,8 +16,8 @@ struct Instrument {
      * @param contract an OptionContract 
      * @param payoff the payoff of the instrument
      */
-    Instrument(OptionContract& contract, std::unique_ptr<Payoff> payoff) : 
-        contract_(contract),
+    Instrument(OptionContract contract, std::shared_ptr<Payoff> payoff) : 
+        contract_(std::move(contract)),
         payoff_(std::move(payoff))
     {};
 
@@ -40,7 +40,7 @@ struct Instrument {
     double compute_payoff(const SimulationResult& simulation) const;
 
     private:
-        OptionContract& contract_;
-        std::unique_ptr<Payoff> payoff_; 
+        OptionContract contract_;
+        std::shared_ptr<Payoff> payoff_; 
 
 };

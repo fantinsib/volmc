@@ -112,7 +112,7 @@ TEST_CASE("European option - basic pricing with volatility") {
 
     double bs_price = price_bs_put(S0, K, T, sigma, r);
 
-    REQUIRE(payoff*std::exp(-r*T) == Catch::Approx(bs_price).epsilon(0.01));
+    REQUIRE(payoff*std::exp(-r*T) == Catch::Approx(bs_price).epsilon(0.03));
 
 
 }

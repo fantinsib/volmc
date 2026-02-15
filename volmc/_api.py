@@ -5,6 +5,7 @@ from ._volmc import _Model, _BlackScholes, _Heston, _Dupire
 from ._volmc import _EulerHeston, _EulerBlackScholes, _QE, _Scheme, _EulerDupire
 from ._volmc import _MonteCarlo
 from ._volmc import _LocalVolatilitySurface
+from ._volmc import _OptionContract, _Payoff, _PutPayoff, _CallPayoff, _DigitalCallPayoff,_DigitalPutPayoff, _Instrument
 
 
 from typing import TYPE_CHECKING
@@ -311,3 +312,99 @@ class LocalVolatilitySurface(_LocalVolatilitySurface):
             The interpolated local volatility
         """
         return self._sigma(t, S)
+    
+#-------------------------------- Options
+
+class OptionContract(_OptionContract):
+
+    def __init__(self, K : float, T: float):
+        """
+        Term sheet for an option contract 
+
+        Parameters
+        ----------
+        K : float
+            The strike price
+        T : float 
+            Time to maturity in years
+        """
+        super().__init__(K, T)
+    
+class CallPayoff(_CallPayoff):
+    
+    def __init__(self, K: float):
+        """ 
+        Payoff for a European call option
+
+        Parameters
+        ----------
+        K : float 
+            The strike price
+        """
+        super().__init__(K)
+
+    
+class PutPayoff(_PutPayoff):
+    
+    def __init__(self, K: float):
+        """ 
+        Payoff for a European put option
+
+        Parameters
+        ----------
+        K : float 
+            The strike price
+        """
+        super().__init__(K)
+
+class DigitalPutPayoff(_DigitalPutPayoff):
+    
+    def __init__(self, K: float):
+        """ 
+        Payoff for a digital put option
+
+        Parameters
+        ----------
+        K : float 
+            The strike price
+        """
+        super().__init__(K)
+
+    
+class DigitalCallPayoff(_DigitalCallPayoff):
+    
+    def __init__(self, K: float):
+        """ 
+        Payoff for a digital call option
+
+        Parameters
+        ----------
+        K : float 
+            The strike price
+        """
+        super().__init__(K)
+
+class Instrument(_Instrument):
+    def __init__(self, contract : OptionContract, payoff : Payoff):
+        """
+        Financial instrument. 
+
+        Parameters
+        ----------
+        contract : OptionContract
+            The term sheet
+        payoff : Payoff
+            The payoff of the instrument
+        """
+
+        super().__init__(contract, payoff)
+
+    def compute_payoff(self, results: SimulationResult) -> float:
+        """
+        Returns the average payoff across all paths in a MonteCarlo SimulationResult.
+        """
+        return self._compute_payoff(results.res)
+
+    # Backward-compatible alias
+    def compute(self, results: SimulationResult) -> float:
+        return self.compute_payoff(results)

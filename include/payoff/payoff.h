@@ -39,6 +39,14 @@ class PutPayoff : public Payoff {
     public:
 
     PutPayoff(double K) : strike_(K) {};
+
+    /**
+     * @brief Compute the value of the payoff 
+     * for a put option (max(K-S), 0).
+     * 
+     * @param S 
+     * @return double 
+     */
     double compute(double S) const override {
         return std::max((strike_ - S), 0.0);
     } ;
@@ -57,6 +65,22 @@ class DigitalCallPayoff : public Payoff{
     DigitalCallPayoff(double K) : strike_(K) {};
     double compute(double S) const override {
         return (S > strike_) ? 1.0 : 0.0; 
+    } ;
+    double get_strike() const {return strike_;}
+
+    private:
+
+    double strike_;
+
+};
+
+class DigitalPutPayoff : public Payoff{
+    
+    public:
+
+    DigitalPutPayoff(double K) : strike_(K) {};
+    double compute(double S) const override {
+        return (S < strike_) ? 1.0 : 0.0; 
     } ;
     double get_strike() const {return strike_;}
 
