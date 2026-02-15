@@ -34,7 +34,7 @@ class EulerHeston : public Scheme
     * 
     * @return State : a State object representing the initial state
     */
-    State init_state(float S0, std::optional<float> v0) const override;
+    State init_state(double S0, std::optional<double> v0) const override;
 
     /**
     * @brief Generates a new Heston spot value and volatility level 

@@ -7,17 +7,18 @@
 
 
 
-/**
- * @brief Scheme for the discretization of the Black Scholes
- * model with log Euler method. 
- *
- * @param model : a BlackScholes model 
- *
- */
+//Class for the log-Euler discretization of the Black Scholes model
 class EulerBlackScholes : public Scheme 
 {
 
     public:
+    /**
+    * @brief Scheme for the discretization of the Black Scholes
+    * model with log Euler method. 
+    *
+    * @param model : a BlackScholes model 
+    *
+    */
     EulerBlackScholes(BlackScholes model):
     model(model)
     {};
@@ -33,7 +34,7 @@ class EulerBlackScholes : public Scheme
     * 
     * @return State : a State object representing the initial state
     */
-    State init_state(float S0, std::optional<float> v0) const override;
+    State init_state(double S0, std::optional<double> v0) const override;
 
     /**
     * @brief Generates a new Black-Scholes spot using a log-Euler discretization

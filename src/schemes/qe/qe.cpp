@@ -23,7 +23,7 @@ void QE::set_psi_c(float p){
 };
 
 
-State QE::init_state(float S0, std::optional<float> v0) const {
+State QE::init_state(double S0, std::optional<double> v0) const {
 
     if (!v0.has_value()) throw std::invalid_argument("QE::init_state : intial state must receive a value for initial volatility");
     State state{S0, v0};

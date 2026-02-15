@@ -18,7 +18,7 @@ class QE : public Scheme {
 public:
     explicit QE(const Heston& model, float psi_threshold = 1.5f);
 
-    State init_state(float S0, std::optional<float> v0) const override;
+    State init_state(double S0, std::optional<double> v0) const override;
     /**
      * @brief Generates a new Heston spot value and volatility level 
      * using a Quadratic Exponential discretization

@@ -20,6 +20,7 @@ add_library(volmc
     src/types/simulationresult.cpp
     src/options/optioncontract.cpp
     src/surface/local_vol.cpp
+    src/instruments/instrument.cpp
 )
 
 target_include_directories(volmc

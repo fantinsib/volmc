@@ -2,13 +2,17 @@
 
 #include <optional>
 
+/**
+ * @brief Snapshot of an instant t in a Path
+ * 
+ */
 struct State {
 
-    float S;
-    std::optional<float> v = std::nullopt;
+    double S;
+    std::optional<double> v = std::nullopt;
 
-    float spot() const {return S;}
-    std::optional<float> vol() const {
+    double spot() const {return S;}
+    std::optional<double> vol() const {
         return v;
 }
 

@@ -12,7 +12,7 @@
 
 
 
-State EulerHeston::init_state(float S0, std::optional<float> v0) const {
+State EulerHeston::init_state(double S0, std::optional<double> v0) const {
     
     if (!v0.has_value()) throw std::invalid_argument("EulerHeston::init_state : intial state must receive a value for initial variance");
     State state{S0, v0};

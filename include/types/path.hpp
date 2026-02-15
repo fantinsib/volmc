@@ -29,8 +29,8 @@ public:
     const_iterator begin() const {return states.begin();}
     const_iterator end() const {return states.end();}
 
-    State end_state() {return states.back();}
-    size_t size() {return states.size();}
+    State end_state() const {return states.back();}
+    size_t size() const {return states.size();}
     void set_size(size_t size) {
         states.resize(size);
     };

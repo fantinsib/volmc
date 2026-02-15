@@ -14,7 +14,16 @@ class CallPayoff : public Payoff {
 
 public:
 
+    //Constructor
     CallPayoff(double K) : strike_(K) {};
+
+    /**
+     * @brief Compute the value of the payoff 
+     * for a call option (max(S-K), 0).
+     * 
+     * @param S 
+     * @return double 
+     */
     double compute(double S) const override {
         return std::max((S - strike_), 0.0);
     } ;

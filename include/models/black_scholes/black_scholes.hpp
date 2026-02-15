@@ -11,6 +11,9 @@
  * This struct stores the main param of the BS model. Parameters 
  * include 'mu' (float) : the drift of the asset and 'sigma' (float) :
  * its volatility which must be greater or equal to zero. 
+ * 
+ * @param mu : the drift rate 
+ * @param sigma : the volatility
  *
  */
 struct BlackScholes : Model {

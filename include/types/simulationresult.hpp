@@ -15,10 +15,15 @@ struct PathBundle {
 
     std::vector<Path> paths;
 
+    /**
+     * @brief Returns a vector of all the spot values
+     * in row-major order
+     * 
+     * @return std::vector<float> 
+     */
     std::vector<float> unravel_spot(){
 
         std::vector<float> spots;
-        
         for (size_t p = 0; p<n_paths; p++){
             for (State& s : paths[p]){
                 spots.push_back(s.spot());
@@ -27,12 +32,15 @@ struct PathBundle {
         return spots;
     };
 
+    /**
+     * @brief Returns a vector of all the var values
+     * in row-major order
+     * 
+     * @return std::vector<float> 
+     */
     std::vector<float> unravel_var(){
         std::vector<float> vars;
-
-         
         for (size_t p = 0; p<n_paths; p++){
-
             for (State& s : paths[p]){
                 if (!s.vol().has_value()) return std::vector<float>(0);
                 vars.push_back(s.vol().value());
@@ -44,7 +52,8 @@ struct PathBundle {
 };
 
 /**
- * @brief Structure containing a collection of Paths
+ * @brief Structure containing a collection of Paths and representing 
+ * the evolution of the spot and of the variance of the process
  * 
  */
 struct SimulationResult {
@@ -52,12 +61,10 @@ struct SimulationResult {
     size_t origin_seed;
     size_t n_paths;
     size_t n_steps;
-    //Model model;
-    //Scheme scheme;
 
-    size_t get_npaths() {return n_paths;}
-    size_t get_seed() {return origin_seed;}
-    size_t get_nsteps() {return n_steps;}
+    size_t get_npaths() const {return n_paths;}
+    size_t get_seed() const {return origin_seed;}
+    size_t get_nsteps() const {return n_steps;}
 
     /**
      * @brief Returns the average final value of
@@ -66,6 +73,13 @@ struct SimulationResult {
      * @return float 
      */
     float avg_terminal_value();
+
+    /**
+     * @brief Returns a vector of all the Paths in the simulation
+     * 
+     * @return std::vector<Path> 
+     */
+    std::vector<Path> get_paths() const {return pathbundle->paths;}
 
     std::shared_ptr<PathBundle> pathbundle;
 

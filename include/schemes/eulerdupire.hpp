@@ -24,7 +24,7 @@ class EulerDupire : public Scheme {
     * 
     * @return State : a State object representing the initial state
     */
-    State init_state(float S0, std::optional<float> v0) const override;
+    State init_state(double S0, std::optional<double> v0) const override;
 
 
     State step(const State& state, int i, float dt, std::mt19937& rng) const override;

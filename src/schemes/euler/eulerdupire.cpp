@@ -13,7 +13,7 @@ EulerDupire::EulerDupire(Dupire model) :
     {};
 
 
-State EulerDupire::init_state(float S0, std::optional<float> v0) const{
+State EulerDupire::init_state(double S0, std::optional<double> v0) const{
     
     if (v0.has_value()) throw std::invalid_argument("EulerDupire::init_state : unexpected initial volatility");
     double v = model_.sigma(0.0, S0);
