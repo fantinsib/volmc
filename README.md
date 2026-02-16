@@ -33,6 +33,7 @@ Schemes describe how to discretize a model at each time step.
 - Dupire discretization (`EulerDupire`)
 - Quadratic Exponential (`QE`)
 
+
 **`Engine`** 
 
 The engine in charge of generating the paths
@@ -45,6 +46,14 @@ The engine in charge of generating the paths
         - `T` the time period of generation
         - `n_paths` the number of paths to generate
     - `.configure()` : use to set the seed of the engine and the `n_jobs` parameter for the number of CPU cores to use (-1 for maximum)
+
+**`Instrument`**
+
+Base class for creating financial instruments. `Instrument` takes as input an `OptionContract` with strike price `K` and maturity in years `T` and a `Payoff`. Currently supported payoffs are the following : 
+- `CallPayoff` : European Call Payoff with payoff $\max((S-K), 0)$
+- `PutPayoff` : European Put Payoff with payoff $\max((K-S), 0)$
+- `DigitalCallPayoff` : European Digital Call Payoff with payoff $1_{S>K}$
+- `DigitalPutPayoff` : European Digital Put Payoff with payoff $1_{K>S}$
 
 ## Basic Demo
 
@@ -84,9 +93,31 @@ m_price = sim.mean_terminal_spot()
 ## Basic Pricing Example
 
 ```python
-final_spots = S[:,-1]
-payoffs = np.maximum((final_spots - K), 0)
-call_price = np.exp(-r*T) * payoffs.mean()
+strike = 105
+T = 0.8
+r = 0.02
+S0 = 100
+sigma = 0.15
+
+contract = OptionContract(K = strike, T = T)
+payoff_call = CallPayoff(strike)
+
+call_option = Instrument(contract, payoff_call)
+
+bs = BlackScholes(mu = r, sigma = sigma)
+mc = MonteCarlo(EulerBlackScholes(bs))
+mc.configure(seed=1, n_jobs=-1)
+sim = mc.generate(S0 = S0, n = 252, T = T, n_paths = 100_000)
+
+mc_payoff = call_option.compute_payoff(sim)
+mc_price = mc_payoff*np.exp(-r*T)
+
+print(f"Monte Carlo estimated price : {mc_price:.4f}")
+print(f"Black-Scholes price : {bs_call_price(S0, strike, sigma, T, r):.4f}")
+```
+```bash
+Monte Carlo estimated price : 3.9279
+Black-Scholes price : 3.9322
 ```
 
 The following graph shows the convergence of the price estimation depending on the number of paths generated. Red line indicates the exact Black Scholes price for this call. 
