@@ -99,7 +99,7 @@ class DigitalPutPayoff : public Payoff{
     double strike_;
 
 };
-
+/*
 enum Dir {Up, Down};
 enum Act {In, Out};
 
@@ -118,4 +118,4 @@ class Barrier : public Payoff {
                 if (p >= barr_) return True;
             };
         };
-}
+}*/
