@@ -5,7 +5,9 @@
 |  __/| |  | | (_|  __/ |   
 |_|   |_|  |_|\___\___|_|  
 */
+#pragma once
 #include "instruments/instrument.h"
+#include "types/marketstate.h"
 #include "engine/montecarlo.hpp"
 #include "engine/engine.hpp"
 #include <unordered_map>
@@ -33,7 +35,7 @@ class Pricer {
      * @param n_paths The number of paths to simulate
      * @return double The estimated price
      */
-    double compute_price(MarketState market_state, int n_steps, int n_paths);
+    double compute_price(const MarketState& market_state, int n_steps, int n_paths);
     
     /**
      * @brief Performs a Monte Carlo simulation for the instrument and returns 
@@ -44,7 +46,7 @@ class Pricer {
      * @param n_paths The number of paths to simulate
      * @return PricingResult A struct containing the price, the delta, the gamma, the theta and the vega of the option
      */
-    PricingResult compute(MarketState market_state, int n_steps, int n_paths);
+    PricingResult compute(const MarketState& market_state, int n_steps, int n_paths);
 
 
     /**
@@ -56,7 +58,7 @@ class Pricer {
      * @param h The finite difference bump 
      * @return double 
      */
-    double compute_delta_bar(MarketState market_state, int n_steps, int n_paths, double h);
+    double compute_delta_bar(const MarketState& market_state, int n_steps, int n_paths, double h);
 
     
 

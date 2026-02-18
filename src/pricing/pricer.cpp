@@ -1,9 +1,10 @@
 
 #include "pricing/pricer.h"
 #include "instruments/instrument.h"
-#include "instruments/marketstate.h"
+#include "types/marketstate.h"
 #include "types/simulationresult.hpp"
 #include <cmath>
+#include <random>
 #include <stdexcept>
 #include <unordered_map>
 
@@ -31,9 +32,9 @@ double Pricer::compute_price(const MarketState& market_state, int n_steps, int n
 
 };
 
-PricingResult Pricer::compute(MarketState market_state, int n_steps, int n_paths) {};
+PricingResult Pricer::compute(const MarketState& market_state, int n_steps, int n_paths) {};
 
-double Pricer::compute_delta_bar(MarketState market_state, int n_steps, int n_paths, double h) {
+double Pricer::compute_delta_bar(const MarketState& market_state, int n_steps, int n_paths, double h) {
 
     if (n_steps <= 0) throw std::invalid_argument("Pricer::compute_delta_bar : n_steps must be superior to zero");
     if (n_paths <= 0) throw std::invalid_argument("Pricer::compute_delta_bar : n_paths must be superior to zero");
@@ -44,10 +45,13 @@ double Pricer::compute_delta_bar(MarketState market_state, int n_steps, int n_pa
     double S0_m = market_state.spot() - h;
     double r = market_state.rf_rate();
     double T = instrument_.get_maturity();
-    
-    SimulationResult res_p = generator_.generate(S0_p,  n_steps, T, n_paths);
-    generator_.reset_rng();
-    SimulationResult res_m = generator_.generate(S0_m,  n_steps, T, n_paths);
+
+    MonteCarlo local_generator = generator_; //to avoid changing the user's rng state
+
+    local_generator.reset_rng();
+    SimulationResult res_p = local_generator.generate(S0_p,  n_steps, T, n_paths);
+    local_generator.reset_rng();
+    SimulationResult res_m = local_generator.generate(S0_m,  n_steps, T, n_paths);
     double payoff_p = instrument_.compute_payoff(res_p);
     double payoff_m = instrument_.compute_payoff(res_m);
     double price_p = payoff_p * std::exp(-r*T);
@@ -55,6 +59,5 @@ double Pricer::compute_delta_bar(MarketState market_state, int n_steps, int n_pa
 
     return (price_p-price_m)/(2.0*h);
     
-
 };
 

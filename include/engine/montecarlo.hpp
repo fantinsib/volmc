@@ -6,7 +6,7 @@
 |_| |_| |_|\___/|_| |_|\__\___|  \___\__,_|_|  |_|\___/ 
 
 */
-
+#pragma once
 #include "engine.hpp"
 #include "schemes/schemes.hpp"
 #include <memory>

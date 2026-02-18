@@ -127,7 +127,8 @@ TEST_CASE("Monte Carlo - BlackScholes & Euler - Randomness"){
         if (spots2[i] != spots3[i]) {sim2_3_diff = true;}
         if (spots3[i] != spots4[i]) {sim3_4_diff = true;}
     }
-    REQUIRE(sim2_3_diff && sim3_4_diff);
+    REQUIRE(sim2_3_diff);
+    REQUIRE(sim3_4_diff);
 
 }
 
