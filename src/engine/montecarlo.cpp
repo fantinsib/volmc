@@ -22,7 +22,10 @@ Path MonteCarlo::simulate_path(float S0,
                                ){
 
     float dt = T/static_cast<float>(n);
-    State state = scheme_->init_state(S0, v0);
+    std::optional<double> var0;
+    if (v0.has_value()) var0 = v0.value()*v0.value(); 
+    else var0 = std::nullopt;
+    State state = scheme_->init_state(S0, var0);
     Path path; 
     path.set_size(static_cast<size_t>(n+1));
     path.set_step(state, 0);

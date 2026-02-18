@@ -30,8 +30,8 @@ State EulerHeston::step(const State& state,
     if (dt <= 0) throw std::invalid_argument("EulerBlackScholes::step : dt must be stricltly positive");
     float logS = std::log(state.spot());
     
-    if (!state.vol().has_value()) throw std::logic_error("EulerHeston::step : no value found for V in State");
-    float V = (state.vol().value());
+    if (!state.variance().has_value()) throw std::logic_error("EulerHeston::step : no value found for V in State");
+    float V = (state.variance().value());
 
     std::normal_distribution<float> dist;
 

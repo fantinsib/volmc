@@ -337,6 +337,7 @@ TEST_CASE("Dupire - Basic Usage") {
 
     mc.configure(1, -1);
     
+    
     SimulationResult res = mc.generate(100, 252,1, 20);
 
     REQUIRE(res.avg_terminal_value() != 100);

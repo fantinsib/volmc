@@ -154,3 +154,31 @@ TEST_CASE("Pricer : delta computation") {
 
     REQUIRE(mc_delta == Catch::Approx(call_delta_val).epsilon(0.03));
 };
+
+TEST_CASE("Pricer : delta computation with randomness") {
+
+    double S0 = 100;
+    double K = 105;
+    double r = 0.02;
+    double sigma = 0.2;
+    double T = 1.1;
+
+    OptionContract contract(K, T);
+
+    Instrument call(contract, std::make_unique<CallPayoff>(K));
+
+    BlackScholes bs(r, sigma);
+    EulerBlackScholes euler(bs);
+    MonteCarlo engine(euler);
+
+    engine.configure(1, -1);
+    Pricer pricer(call, engine);
+
+    MarketState mstate(S0, r);
+
+    double mc_delta1 = pricer.compute_delta_bar(mstate, 252, 10000,1e-4);
+    double mc_delta2 = pricer.compute_delta_bar(mstate, 252, 10000,1e-4);
+    
+
+    REQUIRE(mc_delta1 == mc_delta2);
+};
