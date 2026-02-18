@@ -108,11 +108,26 @@ TEST_CASE("Monte Carlo - BlackScholes & Euler - Randomness"){
     REQUIRE(mc1.get_seed() == 1);
     REQUIRE(mc2.get_seed() == 1);
     REQUIRE(mc3.get_seed() == 2);
-    
-    REQUIRE(simulation1.avg_terminal_value() == simulation2.avg_terminal_value());
-    REQUIRE(simulation1.avg_terminal_value() != simulation3.avg_terminal_value());
-    REQUIRE(simulation3.avg_terminal_value() != simulation4.avg_terminal_value());
 
+    std::vector<float> spots1 = simulation1.pathbundle->unravel_spot();
+    std::vector<float> spots2 = simulation2.pathbundle->unravel_spot();
+    std::vector<float> spots3 = simulation3.pathbundle->unravel_spot();
+    std::vector<float> spots4 = simulation4.pathbundle->unravel_spot();
+
+    // 1 and 2 must have the same path because they are both generated from the
+    // same rng and same seed
+    // 1 and 3 must differ because they are generated from distinct seed
+    // 3 and 4 must differ because they are generated from the same seed 
+    // but from a rng in a different state 
+    
+    bool sim2_3_diff = false;
+    bool sim3_4_diff = false;
+    for (size_t i=0; i < spots1.size(); i++){
+        REQUIRE(spots1[i] == spots2[i]);
+        if (spots2[i] != spots3[i]) {sim2_3_diff = true;}
+        if (spots3[i] != spots4[i]) {sim3_4_diff = true;}
+    }
+    REQUIRE(sim2_3_diff && sim3_4_diff);
 
 }
 
@@ -150,12 +165,12 @@ TEST_CASE("Monte Carlo - Reset RNG and seed") {
         REQUIRE(spots1.size() == spots2.size());
 
         
-        for (size_t i = 1; i < spots1.size(); i++){
-            REQUIRE(spots1[i] != spots2[i]);
-        };
+        bool identical = true;
+        for (size_t i = 0; i < spots1.size(); ++i) {
+            if (spots1[i] != spots2[i]) { identical = false; break; }
+        }
+        REQUIRE(identical == false);
     }
-    
-
 
 } 
 

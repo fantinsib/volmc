@@ -44,11 +44,9 @@ double Pricer::compute_delta_bar(MarketState market_state, int n_steps, int n_pa
     double S0_m = market_state.spot() - h;
     double r = market_state.rf_rate();
     double T = instrument_.get_maturity();
-    size_t seed = generator_.get_seed();
-
-    MonteCarlo generator1 = MonteCarlo()
-
+    
     SimulationResult res_p = generator_.generate(S0_p,  n_steps, T, n_paths);
+    generator_.reset_rng();
     SimulationResult res_m = generator_.generate(S0_m,  n_steps, T, n_paths);
     double payoff_p = instrument_.compute_payoff(res_p);
     double payoff_m = instrument_.compute_payoff(res_m);
