@@ -25,3 +25,4 @@ double Instrument::compute_payoff(const SimulationResult& simulation) const {
     }
     return payoff_avg/static_cast<double>(n_paths);
 };
+

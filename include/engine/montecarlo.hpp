@@ -79,12 +79,24 @@ public:
     //returns the current seed
     int get_seed() {return seed_;}
 
+    // Reset the state of the random number generator to its initial state
+    void reset_rng() {rng_.seed(seed_);};
+    
+    // Forgets the previously set seed and set a new random seed
+    void reset_seed() {
+        std::random_device rd;
+        std::mt19937 rng(rd());
+        seed_ = rng();
+        user_set_seed_ = false; 
+    }
+
     private:
     const std::shared_ptr<Scheme> scheme_; 
 
     size_t seed_;
     std::mt19937 rng_;
     int n_jobs_ = 1;
+    bool user_set_seed_ = false; 
 
     
 };

@@ -39,6 +39,8 @@ struct Instrument {
      */
     double compute_payoff(const SimulationResult& simulation) const;
 
+    double get_maturity() const {return contract_.T;};
+
     private:
         OptionContract contract_;
         std::shared_ptr<Payoff> payoff_; 

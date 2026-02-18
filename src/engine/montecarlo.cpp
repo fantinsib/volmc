@@ -9,6 +9,7 @@
 #include <random>
 #include <stdexcept>
 #include <exception>
+#include <sys/_types/_size_t.h>
 #include <thread>
 #include <omp.h>
 
@@ -45,10 +46,15 @@ SimulationResult MonteCarlo::generate(float S0,
     std::vector<Path> all_paths(n_paths);
     std::exception_ptr eptr = nullptr;
 
+    std::vector<size_t> seeds_vector(n_paths);
+    for (size_t i = 0; i < n_paths; i++){
+        seeds_vector[i] = rng_();
+    }
+
     #pragma omp parallel for num_threads(n_jobs_)
     for (size_t p = 0; p < n_paths; p++){
         try {
-            std::mt19937 rng(static_cast<unsigned int>(seed_ +p));
+            std::mt19937 rng(static_cast<unsigned int>(seeds_vector[p]));
             all_paths[p] = simulate_path(S0, n, T, rng, v0);
             }
         catch(...) {
@@ -72,6 +78,7 @@ void MonteCarlo::configure(std::optional<int> seed, std::optional<int> n_jobs){
         if (seed.value()<0) throw std::invalid_argument("MonteCarlo::configure : seed value must be positive");
         seed_ = static_cast<size_t>(seed.value());
         rng_.seed(seed_);
+        user_set_seed_ = true; 
     }
 
     if (n_jobs.has_value()) {

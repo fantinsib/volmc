@@ -53,9 +53,25 @@ TEST_CASE("Monte Carlo - BlackScholes & Euler - basic usage"){
         REQUIRE(i > 0);
     }
         
+}
 
+TEST_CASE("Monte Carlo - Randomness with no seed") {
+    BlackScholes bs{0.02, 0.1};
+    EulerBlackScholes eu_scheme(bs);
+    MonteCarlo mc(eu_scheme);
 
+    SimulationResult sim1 = mc.generate(100, 252, 1, 1);
+    SimulationResult sim2 = mc.generate(100, 252, 1, 1);
 
+    std::vector<float> spots1 = sim1.pathbundle->unravel_spot();
+    std::vector<float> spots2 = sim2.pathbundle->unravel_spot();
+
+    REQUIRE(spots1.size() == spots2.size());
+    
+    for (size_t i = 1; i < spots1.size(); i++){
+        REQUIRE(spots1[i] != spots2[i]);
+    };
+    
 
 }
 
@@ -74,6 +90,11 @@ TEST_CASE("Monte Carlo - BlackScholes & Euler - Randomness"){
     SimulationResult simulation2= mc2.generate(100, 252, 1, 1);
     mc3.configure(2);
     SimulationResult simulation3= mc3.generate(100, 252, 1, 1);
+    SimulationResult simulation4= mc3.generate(100, 252, 1, 1);
+
+    // The 2 separately instanciated MC generators with the same seed should yield the same result, and 
+    // a different one from another MC generator with a different seed. 
+    // however, the same same generator called twice with a fixed seed should give different results
 
     REQUIRE(simulation1.get_nsteps() == 252);
     REQUIRE(simulation1.avg_terminal_value() != 100);
@@ -81,6 +102,8 @@ TEST_CASE("Monte Carlo - BlackScholes & Euler - Randomness"){
     REQUIRE(simulation2.avg_terminal_value() != 100);
     REQUIRE(simulation3.get_nsteps() == 252);
     REQUIRE(simulation3.avg_terminal_value() != 100);
+    REQUIRE(simulation4.get_nsteps() == 252);
+    REQUIRE(simulation4.avg_terminal_value() != 100);
 
     REQUIRE(mc1.get_seed() == 1);
     REQUIRE(mc2.get_seed() == 1);
@@ -88,9 +111,53 @@ TEST_CASE("Monte Carlo - BlackScholes & Euler - Randomness"){
     
     REQUIRE(simulation1.avg_terminal_value() == simulation2.avg_terminal_value());
     REQUIRE(simulation1.avg_terminal_value() != simulation3.avg_terminal_value());
+    REQUIRE(simulation3.avg_terminal_value() != simulation4.avg_terminal_value());
 
 
 }
+
+TEST_CASE("Monte Carlo - Reset RNG and seed") {
+    BlackScholes bs{0.02, 0.2};
+    EulerBlackScholes eu_bs(bs);
+    MonteCarlo mc(eu_bs);
+
+    SECTION("Reset RNG") {
+        mc.configure(1);
+        SimulationResult sim1 = mc.generate(100, 252, 1, 1);
+        mc.reset_rng();
+        SimulationResult sim2 = mc.generate(100, 252, 1, 1);
+
+        std::vector<float> spots1 = sim1.pathbundle->unravel_spot();
+        std::vector<float> spots2 = sim2.pathbundle->unravel_spot();
+
+        REQUIRE(spots1.size() == spots2.size());
+
+        
+        for (size_t i = 1; i < spots1.size(); i++){
+            REQUIRE(spots1[i] == spots2[i]);
+        };
+    }
+
+        SECTION("Reset seed") {
+        mc.configure(1);
+        SimulationResult sim1 = mc.generate(100, 252, 1, 1);
+        mc.reset_seed();
+        SimulationResult sim2 = mc.generate(100, 252, 1, 1);
+
+        std::vector<float> spots1 = sim1.pathbundle->unravel_spot();
+        std::vector<float> spots2 = sim2.pathbundle->unravel_spot();
+
+        REQUIRE(spots1.size() == spots2.size());
+
+        
+        for (size_t i = 1; i < spots1.size(); i++){
+            REQUIRE(spots1[i] != spots2[i]);
+        };
+    }
+    
+
+
+} 
 
 
 TEST_CASE("Monte Carlo - Heston & Euler - basic usage"){
@@ -259,7 +326,5 @@ TEST_CASE("Dupire - Basic Usage") {
     REQUIRE(res.avg_terminal_value() != 100);
     REQUIRE(res.get_npaths() == 20);
     REQUIRE(res.get_nsteps() == 252);
-
-
 
 }
