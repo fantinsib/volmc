@@ -29,6 +29,15 @@ static double price_bs_call(float S, float K, float T, float sigma, float r) {
 static double call_delta(float S, float K, float T, float sigma, float r){
     double d1 = (std::log(S / K) + (r + 0.5 * sigma * sigma) * T) / (sigma * std::sqrt(T));
     return 0.5 * (1.0 + std::erf(d1 / std::sqrt(2.0)));
+    
+}
+
+static double gamma(float S, float K, float T, float sigma, float r){
+
+    double PI = 3.141592653589793238462;
+    double d1 = (std::log(S / K) + (r + 0.5 * sigma * sigma) * T) / (sigma * std::sqrt(T));
+    double Np_d1 = 1.0/(std::sqrt(2*PI)) * std::exp((-d1*d1)/2);
+    return Np_d1/(S*sigma*std::sqrt(T));
 
 }
 
@@ -181,4 +190,33 @@ TEST_CASE("Pricer : delta computation with randomness") {
     
 
     REQUIRE(mc_delta1 == mc_delta2);
+};
+
+TEST_CASE("Pricer : gamma computation") {
+
+    double S0 = 1.0;
+    double K = 1.05;
+    double r = 0.02;
+    double sigma = 0.2;
+    double T = 1.1;
+
+    OptionContract contract(K, T);
+
+    Instrument call(contract, std::make_unique<CallPayoff>(K));
+
+    BlackScholes bs(r, sigma);
+    EulerBlackScholes euler(bs);
+
+    MonteCarlo engine(euler);
+    engine.configure(1, -1);
+
+    Pricer pricer(call, engine);
+
+    MarketState mstate(S0, r);
+
+    double mc_gamma = pricer.compute_gamma_bar(mstate, 252, 100000,1e-1);
+
+    double call_gamma_val = gamma(S0, K, T, sigma, r);
+
+    REQUIRE(mc_gamma == Catch::Approx(call_gamma_val).epsilon(0.03));
 };

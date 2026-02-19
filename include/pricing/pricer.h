@@ -60,6 +60,16 @@ class Pricer {
      */
     double compute_delta_bar(const MarketState& market_state, int n_steps, int n_paths, double h);
 
+    /**
+     * @brief Compute the gamma of the option using the bump-and-revalue technique
+     * 
+     * @param market_state The market state containing the current spot price and the risk free rate
+     * @param n_steps The number of steps in the simulation
+     * @param n_paths The number of paths to simulate
+     * @param h The finite difference bump 
+     * @return double 
+     */
+    double compute_gamma_bar(const MarketState& market_state, int n_steps, int n_paths, double h);
     
 
     private:
