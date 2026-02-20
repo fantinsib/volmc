@@ -5,7 +5,7 @@
 
 
 
-struct Heston : Model {
+struct Heston : VectorModel {
 
     Heston(float mu, float kappa, float theta, float epsilon, float rho) :
     
@@ -29,6 +29,10 @@ struct Heston : Model {
     float rho;
 
     bool feller_condition() {return feller;}
+
+    double drift(double t, const State& state) const;
+    double diffusion(double t, const State& state) const;
+
 
 private:
     bool feller;

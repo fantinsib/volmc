@@ -37,13 +37,12 @@ State QE::step(const State& state,
                         std::mt19937& rng) const 
 {
 
-    if (!state.vol().has_value()) throw std::invalid_argument("QE::step : state has no volatility");
-
+    if (!state.holds_var()) throw std::invalid_argument("QE::step : the received state has no variance");
     std::normal_distribution<float> N;
     std::uniform_real_distribution<float> U(0.0f, 1.0f);
 
-    float S = state.spot();
-    float V = state.vol().value();
+    float S = state.at(0);
+    float V = state.at(1);
     float exp_sp = std::exp(-model_.kappa * dt);
 
     float E_X = model_.theta + (V- model_.theta) * exp_sp;

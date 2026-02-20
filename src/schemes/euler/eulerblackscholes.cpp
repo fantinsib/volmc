@@ -14,9 +14,7 @@
 
 State EulerBlackScholes::init_state(double S0,  std::optional<double> v0) const { 
 
-    State state{S0};
-    return state;
-    
+    return State{S0};    
 }
 
 
@@ -26,7 +24,7 @@ State EulerBlackScholes::step(const State& state, int i, float dt, std::mt19937&
 
     std::normal_distribution<double> dist;
     
-    double logS = std::log(state.spot());
+    double logS = std::log(state.at(0));
     double Z = dist(rng);
     double logSt = logS + (model.mu - 0.5*model.sigma*model.sigma)*dt + model.sigma*Z * std::sqrt(dt);
 

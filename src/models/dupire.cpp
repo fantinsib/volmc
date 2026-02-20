@@ -1,6 +1,7 @@
 #include "models/dupire/dupire.hpp"
 
 #include "surface/local_vol.hpp"
+#include "types/state.hpp"
 
 Dupire::Dupire(float r, float q, 
            std::shared_ptr<LocalVolatilitySurface> loc_vol_surface):
@@ -9,4 +10,12 @@ Dupire::Dupire(float r, float q,
 
 {}
 
+double Dupire::drift(double t, const State &state) const {
+    return (r_ - q_)*state.at(0);
+}
+
+double Dupire::diffusion(double t, const State &state) const {
+    double S = state.at(0);
+    return lv_surface_->sigma(t, S);
+}
 

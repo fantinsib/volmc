@@ -17,6 +17,7 @@ State EulerDupire::init_state(double S0, std::optional<double> v0) const{
     
     if (v0.has_value()) throw std::invalid_argument("EulerDupire::init_state : unexpected initial volatility");
     double v = model_.sigma(0.0, S0);
+
     return State{S0, v*v};
 }
 
@@ -28,8 +29,8 @@ State EulerDupire::step(const State& state, int i, float dt, std::mt19937& rng) 
 
     std::normal_distribution<float> dist;
     float t = i*dt;
-    float drift = model_.drift();
-    float S = state.spot();
+    float drift = model_.drift(t, state);
+    float S = state.at(0);
     float sigma = model_.sigma(t, S);
     
 

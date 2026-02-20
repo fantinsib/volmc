@@ -14,8 +14,11 @@ add_library(volmc
     src/schemes/euler/eulerblackscholes.cpp
     src/schemes/euler/eulerdupire.cpp
     src/schemes/euler/eulerheston.cpp
+    src/schemes/euler/euler.cpp
     src/engine/montecarlo.cpp
     src/models/dupire.cpp
+    src/models/heston.cpp
+    src/models/blackscholes.cpp
     src/types/date.cpp
     src/types/simulationresult.cpp
     src/options/optioncontract.cpp

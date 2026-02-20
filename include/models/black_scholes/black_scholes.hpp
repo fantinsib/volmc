@@ -1,6 +1,7 @@
 #pragma once
 
 #include "models/model.hpp"
+#include "types/state.hpp"
 #include <stdexcept>
 
 
@@ -22,6 +23,10 @@ struct BlackScholes : Model {
         sigma(sigma) {
             if (sigma < 0) throw std::invalid_argument("Black-Scholes Constructor : sigma must be strictly positive");
         }
+
+    virtual ~BlackScholes() override = default;
+    double drift(double t, const State& state) const override;
+    double diffusion(double t, const State& state) const override;
 
     float mu; 
     float sigma; 

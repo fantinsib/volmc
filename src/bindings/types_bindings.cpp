@@ -27,7 +27,7 @@ namespace py = pybind11;
         for (ssize_t p = 0; p < n_rows; ++p) {
             ssize_t t = 0;
             for (const State& st : b.paths[p]) {
-                r(p, t++) = st.spot();
+                r(p, t++) = st.at(0);
             }
         }
         return out;
@@ -48,8 +48,8 @@ namespace py = pybind11;
         for (ssize_t p = 0; p < n_rows; ++p) {
             ssize_t t = 0;
             for (const State& st : b.paths[p]) {
-                if (!st.vol().has_value()) throw std::runtime_error("Error : no values for volatility");
-                r(p, t++) = st.vol().value();
+                //if (!st.vol().has_value()) throw std::runtime_error("Error : no values for volatility");
+                r(p, t++) = st.at(1);
             }
         }
         return out;
@@ -61,8 +61,8 @@ namespace qe::pybind {
 void bind_types(py::module_& m) {
     py::class_<State>(m, "_State")
         .def(py::init<>())
-        .def("_spot", &State::spot)
-        .def("_vol", &State::vol);
+        .def("_spot", [](const State& s) {return s.at(0);})
+        .def("_vol", [](const State& s) {return s.at(1);});
 
     py::class_<Path>(m, "_Path")
         .def(py::init<>())

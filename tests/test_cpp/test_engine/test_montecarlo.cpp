@@ -40,7 +40,7 @@ TEST_CASE("Monte Carlo - BlackScholes & Euler - basic usage"){
     
 
     REQUIRE(simulation.size() == 253);
-    REQUIRE(simulation.end_state().spot() != 100);
+    REQUIRE(simulation.end_state().at(0) != 100);
     REQUIRE(results.get_npaths() == 10);
     REQUIRE(results.get_npaths() == results.pathbundle->n_paths);
     REQUIRE(results.n_steps == 252);
@@ -188,7 +188,7 @@ TEST_CASE("Monte Carlo - Heston & Euler - basic usage"){
     Path simulation= mc.simulate_path(100, 252, 1, rng, 0.2);
 
     REQUIRE(simulation.size() == 253);
-    REQUIRE(simulation.end_state().spot() != 100);
+    REQUIRE(simulation.end_state().at(0) != 100);
 
 }
 
@@ -241,7 +241,7 @@ TEST_CASE("Monte Carlo - QE - basic usage"){
     Path simulation= mc.simulate_path(100, 252, 1, rng, 0.2);
 
     REQUIRE(simulation.size() == 253);
-    REQUIRE(simulation.end_state().spot() != 100);
+    REQUIRE(simulation.end_state().at(0) != 100);
 
 }
 
@@ -293,8 +293,7 @@ TEST_CASE("Monte Carlo - QE - V > 0"){
     REQUIRE(simulation.size() == 1001);
     
     for (State s : simulation){
-        REQUIRE(s.vol().has_value());
-        REQUIRE(s.vol().value() > 0);
+        REQUIRE(s.at(1) > 0);
     }
 
 }

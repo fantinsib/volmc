@@ -15,6 +15,7 @@
 State EulerHeston::init_state(double S0, std::optional<double> v0) const {
     
     if (!v0.has_value()) throw std::invalid_argument("EulerHeston::init_state : intial state must receive a value for initial variance");
+    if (v0.value() < 0) throw std::invalid_argument("EulerHeston::init_state : intial variance can't be negative");
     State state{S0, v0};
     return state;
 }
@@ -27,11 +28,10 @@ State EulerHeston::step(const State& state,
                         std::mt19937& rng) const 
                         
 {
+    if (!state.holds_var()) throw std::invalid_argument("EulerBlackScholes::step : the received state has no variance");
     if (dt <= 0) throw std::invalid_argument("EulerBlackScholes::step : dt must be stricltly positive");
-    float logS = std::log(state.spot());
-    
-    if (!state.variance().has_value()) throw std::logic_error("EulerHeston::step : no value found for V in State");
-    float V = (state.variance().value());
+    float logS = std::log(state.at(0));    
+    float V = (state.at(1));
 
     std::normal_distribution<float> dist;
 

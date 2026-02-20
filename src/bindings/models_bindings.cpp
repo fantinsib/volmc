@@ -15,10 +15,9 @@ namespace qe::pybind {
 
 void bind_models(py::module_& m) {
 
-    py::class_<Model>(m, "_Model")
-        .def(py::init());
+    py::class_<Model, std::shared_ptr<Model>>(m, "_Model");
 
-    py::class_<BlackScholes>(m, "_BlackScholes")
+    py::class_<BlackScholes, Model, std::shared_ptr<BlackScholes>>(m, "_BlackScholes")
         .def(py::init<float, float>(),
             py::arg("mu"),
             py::arg("sigma"));
@@ -34,7 +33,7 @@ void bind_models(py::module_& m) {
         .def("_feller_condition", &Heston::feller_condition);
 
     
-    py::class_<Dupire>(m, "_Dupire")
+    py::class_<Dupire, Model, std::shared_ptr<Dupire>>(m, "_Dupire")
         .def(py::init<float, float, std::shared_ptr<LocalVolatilitySurface>>(),
             py::arg("r"),
             py::arg("q"),

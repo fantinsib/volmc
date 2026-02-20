@@ -12,6 +12,7 @@ struct PathBundle {
 
     size_t n_paths;
     size_t n_steps;
+    bool has_variance = false;
 
     std::vector<Path> paths;
 
@@ -26,7 +27,7 @@ struct PathBundle {
         std::vector<float> spots;
         for (size_t p = 0; p<n_paths; p++){
             for (State& s : paths[p]){
-                spots.push_back(s.spot());
+                spots.push_back(s.at(0));
             }
         }
         return spots;
@@ -42,8 +43,8 @@ struct PathBundle {
         std::vector<float> vars;
         for (size_t p = 0; p<n_paths; p++){
             for (State& s : paths[p]){
-                if (!s.vol().has_value()) return std::vector<float>(0);
-                vars.push_back(s.vol().value());
+                if (!has_variance) return std::vector<float>(0);
+                vars.push_back(s.at(1));
             }
     }
         return vars;

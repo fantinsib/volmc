@@ -23,7 +23,7 @@ public:
     iterator end() {return states.end();}
 
     const State& at(size_t i) const {
-        if (i > states.size()) throw std::invalid_argument("Path::at : index out of bounds");
+        if (i >= states.size()) throw std::invalid_argument("Path::at : index out of bounds");
         return states[i];}
 
     const_iterator begin() const {return states.begin();}

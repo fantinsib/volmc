@@ -26,7 +26,7 @@ TEST_CASE("Scheme - QE"){
     State init{100, 0.2};
 
     State S{qe.step(init, 0, dt, rng)};
-    REQUIRE(S.spot());
+    REQUIRE(S.at(0));
     }
 
     SECTION("Constructor Error - Heston"){
@@ -39,19 +39,20 @@ TEST_CASE("Scheme - QE"){
     State init{100, 0.2};
 
     State S{qe.step(init, 0, dt, rng)};
-    REQUIRE(S.spot());
+    REQUIRE(S.at(0));
     }
 
     }
 
+    
     SECTION("Init state requires v0"){
         Heston heston{0.02, 2, 0.05, 0.4, -0.5};
         QE qe{heston};
 
         REQUIRE_THROWS_AS(qe.init_state(100.0f, std::nullopt), std::invalid_argument);
         State state = qe.init_state(100.0f, 0.2f);
-        REQUIRE(state.spot() == Catch::Approx(100.0f));
-        REQUIRE(state.vol().has_value() == true);
+        REQUIRE(state.at(0) == Catch::Approx(100.0f));
+        REQUIRE(state.at(1) > 0);
     }
 
     SECTION("Psi threshold bounds"){

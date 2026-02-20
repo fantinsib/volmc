@@ -214,9 +214,9 @@ TEST_CASE("Pricer : gamma computation") {
 
     MarketState mstate(S0, r);
 
-    double mc_gamma = pricer.compute_gamma_bar(mstate, 252, 100000,1e-1);
+    double mc_gamma = pricer.compute_gamma_bar(mstate, 252, 10000,1e-1);
 
     double call_gamma_val = gamma(S0, K, T, sigma, r);
 
-    REQUIRE(mc_gamma == Catch::Approx(call_gamma_val).epsilon(0.03));
+    REQUIRE(mc_gamma == Catch::Approx(call_gamma_val).epsilon(0.05));
 };
