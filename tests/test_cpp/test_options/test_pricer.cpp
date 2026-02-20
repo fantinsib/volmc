@@ -61,7 +61,7 @@ TEST_CASE("Pricer : construction") {
 
     OptionContract contract(K, T);
 
-    Instrument european_call(contract, std::make_unique<CallPayoff>(K));
+    Instrument european_call(contract, std::make_unique<CallPayoff>());
 
     BlackScholes bs(r, sigma);
     EulerBlackScholes euler(bs);
@@ -85,7 +85,7 @@ TEST_CASE("Pricer : basic pricing with vol = 0") {
 
     OptionContract contract(K, T);
 
-    Instrument european_call(contract, std::make_unique<CallPayoff>(K));
+    Instrument european_call(contract, std::make_unique<CallPayoff>());
 
     BlackScholes bs(r, sigma);
     EulerBlackScholes euler(bs);
@@ -116,7 +116,7 @@ TEST_CASE("Pricer : basic pricing with volatility") {
 
     OptionContract contract(K, T);
 
-    Instrument european_put(contract, std::make_unique<PutPayoff>(K));
+    Instrument european_put(contract, std::make_unique<PutPayoff>());
 
     BlackScholes bs(r, sigma);
     EulerBlackScholes euler(bs);
@@ -145,7 +145,7 @@ TEST_CASE("Pricer : delta computation") {
 
     OptionContract contract(K, T);
 
-    Instrument call(contract, std::make_unique<CallPayoff>(K));
+    Instrument call(contract, std::make_unique<CallPayoff>());
 
     BlackScholes bs(r, sigma);
     EulerBlackScholes euler(bs);
@@ -174,7 +174,7 @@ TEST_CASE("Pricer : delta computation with randomness") {
 
     OptionContract contract(K, T);
 
-    Instrument call(contract, std::make_unique<CallPayoff>(K));
+    Instrument call(contract, std::make_unique<CallPayoff>());
 
     BlackScholes bs(r, sigma);
     EulerBlackScholes euler(bs);
@@ -202,7 +202,7 @@ TEST_CASE("Pricer : gamma computation") {
 
     OptionContract contract(K, T);
 
-    Instrument call(contract, std::make_unique<CallPayoff>(K));
+    Instrument call(contract, std::make_unique<CallPayoff>());
 
     BlackScholes bs(r, sigma);
     EulerBlackScholes euler(bs);

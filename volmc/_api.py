@@ -332,7 +332,7 @@ class OptionContract(_OptionContract):
     
 class CallPayoff(_CallPayoff):
     
-    def __init__(self, K: float):
+    def __init__(self):
         """ 
         Payoff for a European call option
 
@@ -341,12 +341,12 @@ class CallPayoff(_CallPayoff):
         K : float 
             The strike price
         """
-        super().__init__(K)
+        super().__init__()
 
     
 class PutPayoff(_PutPayoff):
     
-    def __init__(self, K: float):
+    def __init__(self):
         """ 
         Payoff for a European put option
 
@@ -355,11 +355,11 @@ class PutPayoff(_PutPayoff):
         K : float 
             The strike price
         """
-        super().__init__(K)
+        super().__init__()
 
 class DigitalPutPayoff(_DigitalPutPayoff):
     
-    def __init__(self, K: float):
+    def __init__(self):
         """ 
         Payoff for a digital put option
 
@@ -368,12 +368,12 @@ class DigitalPutPayoff(_DigitalPutPayoff):
         K : float 
             The strike price
         """
-        super().__init__(K)
+        super().__init__()
 
     
 class DigitalCallPayoff(_DigitalCallPayoff):
     
-    def __init__(self, K: float):
+    def __init__(self):
         """ 
         Payoff for a digital call option
 
@@ -382,7 +382,7 @@ class DigitalCallPayoff(_DigitalCallPayoff):
         K : float 
             The strike price
         """
-        super().__init__(K)
+        super().__init__()
 
 class Instrument(_Instrument):
     def __init__(self, contract : OptionContract, payoff : Payoff):

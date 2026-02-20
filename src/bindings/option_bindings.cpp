@@ -24,21 +24,17 @@ void bind_options(py::module_& m){
     py::class_<Payoff, std::shared_ptr<Payoff>>(m, "_Payoff");
 
         py::class_<CallPayoff, Payoff, std::shared_ptr<CallPayoff>>(m, "_CallPayoff")
-            .def(py::init<double>(), py::arg("K"))
-            .def("_compute", &CallPayoff::compute, py::arg("S"));
+            .def(py::init<>());
+            
 
         py::class_<PutPayoff, Payoff, std::shared_ptr<PutPayoff>>(m, "_PutPayoff")
-            .def(py::init<double>(), py::arg("K"))
-            .def("_compute", &PutPayoff::compute, py::arg("S"));
-            
+            .def(py::init<>());
+
         py::class_<DigitalCallPayoff, Payoff, std::shared_ptr<DigitalCallPayoff>>(m, "_DigitalCallPayoff")
-            .def(py::init<double>(), py::arg("K"))
-            .def("_compute", &DigitalCallPayoff::compute, py::arg("S"));
-        
+            .def(py::init<>());
+
         py::class_<DigitalPutPayoff, Payoff, std::shared_ptr<DigitalPutPayoff>>(m, "_DigitalPutPayoff")
-            .def(py::init<double>(), py::arg("K"))
-            .def("_compute", &DigitalPutPayoff::compute, py::arg("S"));
-            
+            .def(py::init<>());
 
     py::class_<Instrument>(m, "_Instrument")
         .def(py::init<OptionContract, std::shared_ptr<Payoff>>())

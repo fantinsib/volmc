@@ -23,7 +23,7 @@ def test_option_constructor():
     T = 1
 
     contract = OptionContract(K, T)
-    call_payoff = CallPayoff(K)
+    call_payoff = CallPayoff()
 
     call = Instrument(contract, call_payoff)
 
@@ -44,7 +44,7 @@ def test_basic_pricing():
     T = 1
 
     contract = OptionContract(K, T)
-    call_payoff = CallPayoff(K)
+    call_payoff = CallPayoff()
 
     call = Instrument(contract, call_payoff)
 

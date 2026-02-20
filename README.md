@@ -100,9 +100,8 @@ S0 = 100
 sigma = 0.15
 
 contract = OptionContract(K = strike, T = T)
-payoff_call = CallPayoff(strike)
 
-call_option = Instrument(contract, payoff_call)
+call_option = Instrument(contract, CallPayoff())
 
 bs = BlackScholes(mu = r, sigma = sigma)
 mc = MonteCarlo(EulerBlackScholes(bs))

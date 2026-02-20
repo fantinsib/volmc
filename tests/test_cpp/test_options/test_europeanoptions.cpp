@@ -42,14 +42,14 @@ TEST_CASE("European option - basic construction"){
         double K = 105;
         OptionContract contract(K, 0.8);
         
-        Instrument european_call(contract, std::make_unique<CallPayoff>(K));
+        Instrument european_call(contract, std::make_unique<CallPayoff>());
     }
 
     SECTION("Put Option"){
         double K = 105;
         OptionContract contract(K, 0.8);
         
-        Instrument european_put(contract, std::make_unique<PutPayoff>(K));
+        Instrument european_put(contract, std::make_unique<PutPayoff>());
     }
     
     
@@ -65,7 +65,7 @@ TEST_CASE("European option - basic pricing with vol = 0") {
 
     OptionContract contract(K, T);
 
-    Instrument european_call(contract, std::make_unique<CallPayoff>(K));
+    Instrument european_call(contract, std::make_unique<CallPayoff>());
 
     BlackScholes bs(r, sigma);
     EulerBlackScholes euler(bs);
@@ -98,7 +98,7 @@ TEST_CASE("European option - basic pricing with volatility") {
 
     OptionContract contract(K, T);
 
-    Instrument european_put(contract, std::make_unique<PutPayoff>(K));
+    Instrument european_put(contract, std::make_unique<PutPayoff>());
 
     BlackScholes bs(r, sigma);
     EulerBlackScholes euler(bs);
