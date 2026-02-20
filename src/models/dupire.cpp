@@ -16,6 +16,6 @@ double Dupire::drift(double t, const State &state) const {
 
 double Dupire::diffusion(double t, const State &state) const {
     double S = state.at(0);
-    return lv_surface_->sigma(t, S);
+    return lv_surface_->sigma(t, S)*S;
 }
 

@@ -31,12 +31,11 @@ State EulerDupire::step(const State& state, int i, float dt, std::mt19937& rng) 
     float t = i*dt;
     float drift = model_.drift(t, state);
     float S = state.at(0);
-    float sigma = model_.sigma(t, S);
+    float diffusion = model_.diffusion(t, state);
     
 
-    float logS = std::log(S);
     float Z = dist(rng);
-    float logSt = logS + (drift - 0.5*sigma*sigma)*dt + sigma*Z * std::sqrt(dt);
+    float St = S + (drift)*dt + diffusion*Z * std::sqrt(dt);
 
-    return State{std::exp(logSt), sigma*sigma};
+    return State{St, diffusion*diffusion/(S*S)};
 };
