@@ -4,9 +4,7 @@ This project aims at implementing a light Monte Carlo engine for asset pricing m
 
 ## Current features 
 
-The code architecture is organized around three main classes : `Model`, `Scheme`, `Engine`.
-
-**`Model`**
+### **`Model`**
 
 The Model class represents the parameters for the stochastic dynamic.
 
@@ -22,19 +20,22 @@ The Model class represents the parameters for the stochastic dynamic.
 - Dupire model (`Dupire`)            
     - `r` : the risk-free rate
     - `q` : the dividend yield
-    - `local_volatility_surface` : the local volatility surface as a `LocalVolatilitySurface` instance 
+    - `local_volatility_surface` : the local volatility surface as a `LocalVolatilitySurface` instance
+- Vasicek model (`Vasicek`)
+    - `a`: the mean-reversion speed
+    - `b` : mean long-term rate
+    - `sigma` : the volatility
 
-**`Schemes`**
+### **`Schemes`**
 
 Schemes describe how to discretize a model at each time step. 
 
-- Black-Scholes exact log discretization (`EulerBlackScholes`)
+- Generic Euler discretization (`Euler`), supported for Black-Scholes, Dupire, Vasicek
 - Heston Euler-type discretization with full truncation (`EulerHeston`)
-- Dupire discretization (`EulerDupire`)
-- Quadratic Exponential (`QE`)
+- Quadratic Exponential for Heston (`QE`)
 
 
-**`Engine`** 
+### **`Engine`** 
 
 The engine in charge of generating the paths
 
@@ -47,7 +48,7 @@ The engine in charge of generating the paths
         - `n_paths` the number of paths to generate
     - `.configure()` : use to set the seed of the engine and the `n_jobs` parameter for the number of CPU cores to use (-1 for maximum)
 
-**`Instrument`**
+### **`Instrument`**
 
 Base class for creating financial instruments. `Instrument` takes as input an `OptionContract` with strike price `K` and maturity in years `T` and a `Payoff`. Currently supported payoffs are the following : 
 - `CallPayoff` : European Call Payoff with payoff $\max((S-K), 0)$
@@ -81,7 +82,6 @@ sim = mc.generate(S0 = 100,
 
 S = sim.spot_values()
 V = sim.var_values()
-m_price = sim.mean_terminal_spot()
 ```
 
 **Output**
@@ -93,33 +93,39 @@ m_price = sim.mean_terminal_spot()
 ## Basic Pricing Example
 
 ```python
-strike = 105
-T = 0.8
-r = 0.02
-S0 = 100
+S = 50
+K = 51
 sigma = 0.15
+n = 252
+T = 1.2
+r= 0.02
 
-contract = OptionContract(K = strike, T = T)
+print(f"Black Scholes price : {bs_put_price(S, K, sigma, T, r):.4f}")
+```
 
-call_option = Instrument(contract, CallPayoff())
+```python
+Black Scholes price : 3.1635
+```
 
-bs = BlackScholes(mu = r, sigma = sigma)
-mc = MonteCarlo(EulerBlackScholes(bs))
-mc.configure(seed=1, n_jobs=-1)
-sim = mc.generate(S0 = S0, n = 252, T = T, n_paths = 100_000)
+```python
+put_option = Instrument(OptionContract(K, T), PutPayoff())
 
-mc_payoff = call_option.compute_payoff(sim)
-mc_price = mc_payoff*np.exp(-r*T)
+bs = BlackScholes(r, sigma)
+mc = MonteCarlo(Euler(bs))
+mc.configure(1, -1)
+
+simulation = mc.generate(S0= S, n=252, T=T, n_paths = 300_000)
+
+mc_payoff = put_option.compute_payoff(simulation)
+mc_price = mc_payoff * np.exp(-r*T)
 
 print(f"Monte Carlo estimated price : {mc_price:.4f}")
-print(f"Black-Scholes price : {bs_call_price(S0, strike, sigma, T, r):.4f}")
 ```
-```bash
-Monte Carlo estimated price : 3.9279
-Black-Scholes price : 3.9322
+```python
+Monte Carlo estimated price : 3.1691
 ```
 
-The following graph shows the convergence of the price estimation depending on the number of paths generated. Red line indicates the exact Black Scholes price for this call. 
+The following graph shows the convergence of the price estimation depending on the number of paths generated. Red line indicates the exact Black Scholes price for this put. 
 
 ![Convergence](doc/img/convergence.png)
 

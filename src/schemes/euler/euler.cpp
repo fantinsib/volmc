@@ -20,12 +20,12 @@ State Euler::step(const State& state, int i, float dt, std::mt19937& rng) const 
     if (dt <= 0) throw std::invalid_argument("EulerBlackScholes::step : dt must be stricltly positive");
 
     std::normal_distribution<double> dist;
-    double logS = std::log(state.at(0));
+    double S = (state.at(0));
     double Z = dist(rng);
     double t = i * dt;
-    double logSt = logS + model_->drift(t, state)*dt + model_->diffusion(t, state)*Z * std::sqrt(dt);
+    double St = S + model_->drift(t, state)*dt + model_->diffusion(t, state)*Z * std::sqrt(dt);
 
-    return State{std::exp(logSt)};
+    return State{St};
 
 
 }
