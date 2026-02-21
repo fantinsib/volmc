@@ -1,7 +1,7 @@
 from __future__ import annotations
 from ._volmc import _State
 from ._volmc import _Path
-from ._volmc import _Model, _BlackScholes, _Heston, _Dupire
+from ._volmc import _Model, _BlackScholes, _Heston, _Dupire, _Vasicek
 from ._volmc import _EulerHeston, _EulerBlackScholes, _QE, _Scheme, _EulerDupire
 from ._volmc import _MonteCarlo
 from ._volmc import _LocalVolatilitySurface
@@ -177,8 +177,25 @@ class Dupire(_Dupire):
         loc_vol_surface : LocalVolatilitySurface
             The local volatility surface.
         """
-        return super().__init__(r, q, local_volatility_surface)
+        super().__init__(r, q, local_volatility_surface)
     
+class Vasicek(_Vasicek):
+    def __init__(self, a: float, b: float, sigma: float):
+        """
+        Creates a Vasicek model
+
+        Parameters
+        ----------
+        a : float
+            Speed of reversion to the mean
+        b : float
+            Long-term mean rate
+        sigma : float
+            The volatility
+        """
+        super().__init__(a, b, sigma)
+
+
 #--------------------------------SCHEMES
 
 class Scheme(_Scheme):

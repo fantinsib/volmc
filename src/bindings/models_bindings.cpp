@@ -6,6 +6,7 @@
 #include "models/black_scholes/black_scholes.hpp"
 #include "models/dupire/dupire.hpp"
 #include "models/heston/heston.hpp"
+#include "models/ir_models/vasicek.h"
 #include "models/model.hpp"
 #include "surface/local_vol.hpp"
 
@@ -39,6 +40,12 @@ void bind_models(py::module_& m) {
             py::arg("q"),
             py::arg("loc_vol_surface")
         );
+
+    py::class_<Vasicek, Model, std::shared_ptr<Vasicek>>(m, "_Vasicek")
+        .def(py::init<float, float, float>(), 
+            py::arg("a"),
+            py::arg("b"),
+            py::arg("sigma"));
 }
 
 } // namespace qe::pybind

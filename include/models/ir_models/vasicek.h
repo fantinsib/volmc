@@ -11,7 +11,7 @@ __     __        _          _
 #include "types/state.hpp"
 #include <stdexcept>
 
-class Vasicek : public RatesModel {
+class Vasicek : public Model {
     
     public :
     /**
@@ -32,8 +32,8 @@ class Vasicek : public RatesModel {
         };
 
     virtual ~Vasicek() override = default;
-    double drift(double t, State& state) override;
-    double diffusion(double t, State& state) override;
+    double drift(double t, const State& state) const override;
+    double diffusion(double t, const State& state) const override;
 
     private :
 

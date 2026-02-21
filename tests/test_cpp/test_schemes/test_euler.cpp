@@ -11,16 +11,19 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>  
+#include <memory>
 #include <optional>
 #include <stdexcept>
 #include "models/black_scholes/black_scholes.hpp"
+#include "models/dupire/dupire.hpp"
 #include "models/heston/heston.hpp"
 #include "schemes/euler.h"
 #include "schemes/eulerblackscholes.hpp"
 #include "schemes/eulerheston.hpp"
+#include "surface/local_vol.hpp"
 
 
-TEST_CASE("Scheme - EulerBlackScholes") {
+TEST_CASE("Scheme - Euler - BlackScholes") {
 
 SECTION("Constructor") {
 
@@ -109,4 +112,56 @@ TEST_CASE("Scheme - EulerHeston") {
         REQUIRE_THROWS_AS(euler_heston.step(init, 0, -0.1f, rng), std::invalid_argument);
     }
 
+}
+
+std::shared_ptr<LocalVolatilitySurface> make_surface() {
+        std::vector<double> t {1,2,3, 4};
+        std::vector<double> s {100,200,300};
+        std::vector<double> vol{0.20, 0.19, 0.21,   
+                                0.22, 0.20, 0.23,   
+                                0.25, 0.24, 0.26,
+                                0.27, 0.28, 0.29};
+
+        LocalVolatilitySurface surface(t, s, vol);    
+        return std::make_shared<LocalVolatilitySurface>(surface);
+    }
+
+TEST_CASE("Scheme - Euler - Dupire ") {
+
+SECTION("Constructor") {
+
+    std::shared_ptr<LocalVolatilitySurface> surface = make_surface();
+    Dupire dupire(0.03, 0.01, surface);
+    Euler euler{dupire};
+
+    std::mt19937 rng;
+    float dt = 0.1;
+    State init{100};
+
+    State S{euler.step(init, 0, dt, rng)};
+    REQUIRE(S.at(0));
+}
+
+SECTION("Init state") {
+
+    std::shared_ptr<LocalVolatilitySurface> surface = make_surface();
+    Dupire dupire(0.03, 0.01, surface);
+    Euler euler{dupire};
+
+    State state = euler.init_state(123.0f, std::nullopt);
+    REQUIRE(state.at(0) == Catch::Approx(123.0f));
+    //REQUIRE(state.vol().has_value() == false);
+}
+
+SECTION("Invalid dt") {
+    std::shared_ptr<LocalVolatilitySurface> surface = make_surface();
+    Dupire dupire(0.03, 0.01, surface);
+    Euler euler{dupire};
+
+    std::mt19937 rng;
+    State init{100};
+
+    REQUIRE_THROWS_AS(euler.step(init, 0, 0.0f, rng), std::invalid_argument);
+    REQUIRE_THROWS_AS(euler.step(init, 0, -0.1f, rng), std::invalid_argument);
+}
 }

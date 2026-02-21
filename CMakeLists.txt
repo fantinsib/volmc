@@ -19,6 +19,7 @@ add_library(volmc
     src/models/dupire.cpp
     src/models/heston.cpp
     src/models/blackscholes.cpp
+    src/models/vasicek.cpp
     src/types/date.cpp
     src/types/simulationresult.cpp
     src/options/optioncontract.cpp

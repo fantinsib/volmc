@@ -1,5 +1,5 @@
 import pytest
-from volmc import BlackScholes, Heston, LocalVolatilitySurface, Dupire
+from volmc import BlackScholes, Heston, LocalVolatilitySurface, Dupire, Vasicek
 
 
 def test_black_scholes_constructor_valid():
@@ -73,3 +73,9 @@ def test_dupire_constructor():
     q = 0.01
 
     dupire = Dupire(r,q,surface)
+
+def test_vasicek_constructor():
+
+    vasicek = Vasicek(1.5, 0.05, 0.1)
+
+    assert(isinstance(vasicek, Vasicek))

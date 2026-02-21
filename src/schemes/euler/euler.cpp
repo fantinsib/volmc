@@ -28,8 +28,4 @@ State Euler::step(const State& state, int i, float dt, std::mt19937& rng) const 
     return State{std::exp(logSt)};
 
 
-    
-
-
-
 }
