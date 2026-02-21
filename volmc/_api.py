@@ -2,7 +2,7 @@ from __future__ import annotations
 from ._volmc import _State
 from ._volmc import _Path
 from ._volmc import _Model, _BlackScholes, _Heston, _Dupire, _Vasicek
-from ._volmc import _EulerHeston, _EulerBlackScholes, _QE, _Scheme, _EulerDupire
+from ._volmc import _EulerHeston, _EulerBlackScholes, _QE, _Scheme, _EulerDupire, _Euler
 from ._volmc import _MonteCarlo
 from ._volmc import _LocalVolatilitySurface
 from ._volmc import _OptionContract, _Payoff, _PutPayoff, _CallPayoff, _DigitalCallPayoff,_DigitalPutPayoff, _Instrument
@@ -222,6 +222,18 @@ class QE(_QE):
 
 class EulerDupire(_EulerDupire):
     def __init__(self, model):
+        super().__init__(model)
+
+class Euler(_Euler):
+    def __init__(self, model):
+        """
+        Generic Euler discretization
+
+        Parameters
+        ----------
+        model : Model
+            A model with a drift and diffusion process.
+        """
         super().__init__(model)
 
 

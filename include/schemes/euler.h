@@ -3,6 +3,7 @@
 #include "models/model.hpp"
 #include "schemes/schemes.hpp"
 #include "types/state.hpp"
+#include <memory>
 #include <random>
 
 
@@ -10,7 +11,7 @@
 class Euler : public Scheme {
 
     public:
-        Euler(Model& model) : model_(model) {};
+        Euler(std::shared_ptr<Model> model) : model_(model) {};
         virtual ~Euler() override = default;
 
         /**
@@ -24,10 +25,8 @@ class Euler : public Scheme {
         State step(const State& state, int i, float dt, std::mt19937& rng) const override;
 
 
-
-
     private:
 
-    const Model& model_;
+    std::shared_ptr<Model> model_;
 
 };

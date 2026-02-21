@@ -28,7 +28,7 @@ TEST_CASE("Scheme - Euler - BlackScholes") {
 SECTION("Constructor") {
 
     BlackScholes bs{0.02, 0.2};
-    Euler euler_bs{bs};
+    Euler euler_bs(std::make_shared<BlackScholes>(bs));
 
     std::mt19937 rng;
     float dt = 0.1;
@@ -40,7 +40,7 @@ SECTION("Constructor") {
 
 SECTION("Init state") {
     BlackScholes bs{0.02, 0.2};
-    Euler euler_bs{bs};
+    Euler euler_bs(std::make_shared<BlackScholes>(bs));
 
     State state = euler_bs.init_state(123.0f, std::nullopt);
     REQUIRE(state.at(0) == Catch::Approx(123.0f));
@@ -49,7 +49,7 @@ SECTION("Init state") {
 
 SECTION("Invalid dt") {
     BlackScholes bs{0.02, 0.2};
-    Euler euler_bs{bs};
+    Euler euler_bs(std::make_shared<BlackScholes>(bs));
 
     std::mt19937 rng;
     State init{100};
@@ -132,7 +132,7 @@ SECTION("Constructor") {
 
     std::shared_ptr<LocalVolatilitySurface> surface = make_surface();
     Dupire dupire(0.03, 0.01, surface);
-    Euler euler{dupire};
+    Euler euler(std::make_shared<Dupire>(dupire));
 
     std::mt19937 rng;
     float dt = 0.1;
@@ -146,7 +146,7 @@ SECTION("Init state") {
 
     std::shared_ptr<LocalVolatilitySurface> surface = make_surface();
     Dupire dupire(0.03, 0.01, surface);
-    Euler euler{dupire};
+    Euler euler(std::make_shared<Dupire>(dupire));
 
     State state = euler.init_state(123.0f, std::nullopt);
     REQUIRE(state.at(0) == Catch::Approx(123.0f));
@@ -156,7 +156,7 @@ SECTION("Init state") {
 SECTION("Invalid dt") {
     std::shared_ptr<LocalVolatilitySurface> surface = make_surface();
     Dupire dupire(0.03, 0.01, surface);
-    Euler euler{dupire};
+    Euler euler(std::make_shared<Dupire>(dupire));
 
     std::mt19937 rng;
     State init{100};

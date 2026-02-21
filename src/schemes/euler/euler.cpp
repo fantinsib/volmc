@@ -23,7 +23,7 @@ State Euler::step(const State& state, int i, float dt, std::mt19937& rng) const 
     double logS = std::log(state.at(0));
     double Z = dist(rng);
     double t = i * dt;
-    double logSt = logS + model_.drift(t, state)*dt + model_.diffusion(t, state)*Z * std::sqrt(dt);
+    double logSt = logS + model_->drift(t, state)*dt + model_->diffusion(t, state)*Z * std::sqrt(dt);
 
     return State{std::exp(logSt)};
 
