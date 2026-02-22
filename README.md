@@ -4,6 +4,8 @@ This project aims at implementing a light Monte Carlo engine for asset pricing m
 
 ## Current features 
 
+This project is organised around modules : models, schemes, options, pricing
+
 ### **`Model`**
 
 The Model class represents the parameters for the stochastic dynamic.
@@ -35,9 +37,7 @@ Schemes describe how to discretize a model at each time step.
 - Quadratic Exponential for Heston (`QE`)
 
 
-### **`Engine`** 
-
-The engine in charge of generating the paths
+### **`Pricing`** 
 
 - `MonteCarlo`
     - `.generate()` : returns a specified number of paths. 
@@ -47,18 +47,25 @@ The engine in charge of generating the paths
         - `T` the time period of generation
         - `n_paths` the number of paths to generate
     - `.configure()` : use to set the seed of the engine and the `n_jobs` parameter for the number of CPU cores to use (-1 for maximum)
+- `Pricer`
+    - Take as input an `Instrument` and an `MonteCarlo`engine.
+    - `.price()` returns an Monte Carlo simulated price
+        - `MarketState` containing `S0`, `r` and optional `v0``
+        - `n_steps` The number of steps in each path
+        - `n_paths` The number of paths 
 
-### **`Instrument`**
+### **`Options`**
 
-Base class for creating financial instruments. `Instrument` takes as input an `OptionContract` with strike price `K` and maturity in years `T` and a `Payoff`. Currently supported payoffs are the following : 
+`Instrument` is the base class for creating financial instruments. `Instrument` takes as input an `OptionContract` with strike price `K` and maturity in years `T` and a `Payoff`. Currently supported payoffs are the following : 
 - `CallPayoff` : European Call Payoff with payoff $\max((S-K), 0)$
 - `PutPayoff` : European Put Payoff with payoff $\max((K-S), 0)$
 - `DigitalCallPayoff` : European Digital Call Payoff with payoff $1_{S>K}$
 - `DigitalPutPayoff` : European Digital Put Payoff with payoff $1_{K>S}$
+- `Barrier` : Barrier payoff, depending on direction, nature and barrier value
 
 ## Basic Demo
 
-A demo notebook is available [here](doc/demo_notebook.ipynb).
+A comprehensive demo notebook is available [here](doc/demo_notebook.ipynb).
 
 ```python
 from volmc import Heston, QE, MonteCarlo, SimulationResult
@@ -108,16 +115,21 @@ Black Scholes price : 3.1635
 ```
 
 ```python
-put_option = Instrument(OptionContract(K, T), PutPayoff())
+from volmc.options import Put
+from volmc.pricing import MonteCarlo, Pricer
+from volmc.types import MarketState
+
+put_option = Put(K, T) #preset Put creation
 
 bs = BlackScholes(r, sigma)
 mc = MonteCarlo(Euler(bs))
 mc.configure(1, -1)
 
-simulation = mc.generate(S0= S, n=252, T=T, n_paths = 300_000)
+market_state = MarketState(S0 = S, r = r)
 
-mc_payoff = put_option.compute_payoff(simulation)
-mc_price = mc_payoff * np.exp(-r*T)
+p = Pricer(put_option, mc)
+
+mc_price = p.price(market_state, n_steps=252, n_paths = 300_000)
 
 print(f"Monte Carlo estimated price : {mc_price:.4f}")
 ```

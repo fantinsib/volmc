@@ -1,4 +1,4 @@
-from ._api import Call, Put, Barrier, CallPayoff, PutPayoff, DigitalCallPayoff, DigitalPutPayoff, Instrument, OptionContract
+from ._api import Call, Put, DigitalCall, DigitalPut, Barrier, CallPayoff, PutPayoff, DigitalCallPayoff, DigitalPutPayoff, Instrument, OptionContract
 
-__all__ = ["Call", "Put", "OptionContract", "PutPayoff", "CallPayoff", "DigitalCallPayoff", "DigitalPutPayoff", "Barrier", "Instrument"]
+__all__ = ["Call", "Put", "OptionContract", "PutPayoff", "CallPayoff", "DigitalCallPayoff", "DigitalPutPayoff", "Barrier", "Instrument", "DigitalCall", "DigitalPut"]
            
