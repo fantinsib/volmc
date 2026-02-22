@@ -5,7 +5,7 @@ from ._volmc import _Model, _BlackScholes, _Heston, _Dupire, _Vasicek
 from ._volmc import _EulerHeston, _EulerBlackScholes, _QE, _Scheme, _EulerDupire, _Euler
 from ._volmc import _MonteCarlo
 from ._volmc import _LocalVolatilitySurface
-from ._volmc import _OptionContract, _Payoff, _PutPayoff, _CallPayoff, _DigitalCallPayoff,_DigitalPutPayoff, _Instrument
+from ._volmc import _OptionContract, _Payoff, _PutPayoff, _CallPayoff, _DigitalCallPayoff,_DigitalPutPayoff, _Instrument, _Barrier, _Direction, _Nature
 
 
 from typing import TYPE_CHECKING
@@ -412,6 +412,38 @@ class DigitalCallPayoff(_DigitalCallPayoff):
             The strike price
         """
         super().__init__()
+
+class Barrier(_Barrier):
+    def __init__(self, H : float, direction : str, nature : str, payoff : Payoff):
+        """
+        Payoff for a barrier option
+
+        Parameters
+        ----------
+        H : float
+            The barrier value
+        direction : str
+            The direction from which the barrier is hit. Must be "up" or "down"
+        nature : str
+            The nature of the barrier. Must be "in" or "out"
+        payoff : Payoff
+            The payoff to be activated or deactivated if the barrier is hit 
+        """
+        if (direction.lower() == "up"):
+            _dir = _Direction.Up
+        elif (direction.lower() == "down"):
+            _dir = _Direction.Down
+        else:
+            raise ValueError(f"Barrier : the direction must be 'up' or 'down', received {direction}.")
+        
+        if (nature.lower() == "in"):
+            _nat = _Nature.In
+        elif (nature.lower() == "out"):
+            _nat = _Nature.Out
+        else:
+            raise ValueError(f"Barrier : the nature must be 'in' or 'out', received {nature}.")
+        
+        super().__init__(H, _dir, _nat, payoff)
 
 class Instrument(_Instrument):
     def __init__(self, contract : OptionContract, payoff : Payoff):

@@ -14,6 +14,7 @@
 #include <memory>
 #include <optional>
 #include <stdexcept>
+#include "engine/montecarlo.hpp"
 #include "models/black_scholes/black_scholes.hpp"
 #include "models/dupire/dupire.hpp"
 #include "models/heston/heston.hpp"
@@ -21,6 +22,7 @@
 #include "schemes/eulerblackscholes.hpp"
 #include "schemes/eulerheston.hpp"
 #include "surface/local_vol.hpp"
+#include "types/simulationresult.hpp"
 
 
 TEST_CASE("Scheme - Euler - BlackScholes") {
@@ -57,6 +59,18 @@ SECTION("Invalid dt") {
     REQUIRE_THROWS_AS(euler_bs.step(init, 0, 0.0f, rng), std::invalid_argument);
     REQUIRE_THROWS_AS(euler_bs.step(init, 0, -0.1f, rng), std::invalid_argument);
 }
+
+SECTION("No volatility") {
+    BlackScholes bs{0.02, 0};
+    Euler euler_bs(std::make_shared<BlackScholes>(bs));
+
+    MonteCarlo engine(euler_bs);
+    engine.configure(1, -1);
+
+    SimulationResult sim = engine.generate(100,100, 1.2,10);
+    REQUIRE(sim.avg_terminal_value() == Catch::Approx(100 * exp(0.02 * 1.2)));
+}
+
 }
 
 TEST_CASE("Scheme - EulerHeston") {

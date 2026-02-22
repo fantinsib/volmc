@@ -23,18 +23,34 @@ void bind_options(py::module_& m){
 
     py::class_<Payoff, std::shared_ptr<Payoff>>(m, "_Payoff");
 
-        py::class_<CallPayoff, Payoff, std::shared_ptr<CallPayoff>>(m, "_CallPayoff")
-            .def(py::init<>());
-            
+    py::class_<CallPayoff, Payoff, std::shared_ptr<CallPayoff>>(m, "_CallPayoff")
+        .def(py::init<>());
+        
+    py::class_<PutPayoff, Payoff, std::shared_ptr<PutPayoff>>(m, "_PutPayoff")
+        .def(py::init<>());
 
-        py::class_<PutPayoff, Payoff, std::shared_ptr<PutPayoff>>(m, "_PutPayoff")
-            .def(py::init<>());
+    py::class_<DigitalCallPayoff, Payoff, std::shared_ptr<DigitalCallPayoff>>(m, "_DigitalCallPayoff")
+        .def(py::init<>());
 
-        py::class_<DigitalCallPayoff, Payoff, std::shared_ptr<DigitalCallPayoff>>(m, "_DigitalCallPayoff")
-            .def(py::init<>());
+    py::class_<DigitalPutPayoff, Payoff, std::shared_ptr<DigitalPutPayoff>>(m, "_DigitalPutPayoff")
+        .def(py::init<>());
 
-        py::class_<DigitalPutPayoff, Payoff, std::shared_ptr<DigitalPutPayoff>>(m, "_DigitalPutPayoff")
-            .def(py::init<>());
+    py::enum_<Direction>(m, "_Direction")
+        .value("Up", Direction::Up)
+        .value("Down", Direction::Down)
+        .export_values();
+
+    py::enum_<Nature>(m, "_Nature")
+        .value("In", Nature::In)
+        .value("Out", Nature::Out)
+        .export_values();
+
+    py::class_<Barrier, Payoff, std::shared_ptr<Barrier>>(m, "_Barrier")
+        .def(py::init<double, Direction, Nature, Payoff&>(),
+            py::arg("H"),
+            py::arg("direction"),
+            py::arg("nature"),
+            py::arg("payoff"));
 
     py::class_<Instrument>(m, "_Instrument")
         .def(py::init<OptionContract, std::shared_ptr<Payoff>>())

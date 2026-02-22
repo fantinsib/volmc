@@ -150,12 +150,15 @@ class Barrier : public Payoff {
             else if (nat_ == Out && !touched) {return payoff_->compute(path, K);}
             else return 0.0;          
                 };
-
+        
     private:
         double barr_;
         Direction dir_; 
         Nature nat_;
         std::shared_ptr<Payoff> payoff_;
+        std::shared_ptr<Payoff> clone() const override {
+            return std::make_shared<Barrier>(*this);
+            }
         
         bool touched_(const Path& path) const {
             

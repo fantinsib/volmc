@@ -1,5 +1,5 @@
 import pytest
-from volmc import BlackScholes, Heston, LocalVolatilitySurface, Dupire, Vasicek, Euler, EulerDupire, MonteCarlo
+from volmc import BlackScholes, Heston, LocalVolatilitySurface, Dupire, Vasicek, Euler, EulerDupire, MonteCarlo, QE
 
 def make_inputs():
     s = [80, 90, 100, 110, 120]
@@ -45,3 +45,16 @@ def test_euler():
     assert(len(sim.spot_values()) == 10)
     assert(sim.spot_values()[0][0] == pytest.approx(0.04))
     assert(sim.spot_values()[0][-1] != 0.04)
+
+def test_qe():
+    heston = Heston(0.02, 1.5, 0.05, 0.2, -0.5)
+    
+    surface = LocalVolatilitySurface(*make_inputs())
+
+
+    mc = MonteCarlo(QE(heston))
+    mc.configure(1)
+    sim = mc.generate(100, 252, 1, 10, 0.04)
+    assert(len(sim.spot_values()) == 10)
+    assert(sim.spot_values()[0][0] == 100)
+    assert(sim.spot_values()[0][-1] != 100)
