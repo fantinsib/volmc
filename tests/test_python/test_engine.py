@@ -1,18 +1,15 @@
 import pytest
 import numpy as np
 
-from volmc import Path, State, SimulationResult
-from volmc import Heston, BlackScholes, Dupire
-from volmc import EulerHeston, EulerBlackScholes, QE, EulerDupire
-from volmc import MonteCarlo
-from volmc import LocalVolatilitySurface
-
-
+from volmc.types import *
+from volmc.models import Heston, BlackScholes, Dupire
+from volmc.schemes import Euler, EulerHeston, QE
+from volmc.pricing import MonteCarlo
 
 def test_basic_monte_carlo_euler_bs():
 
     bs = BlackScholes(0.02, 0.15)
-    euler = EulerBlackScholes(bs)
+    euler = Euler(bs)
     montecarlo = MonteCarlo(euler)
 
     montecarlo.configure(seed=1)
@@ -31,7 +28,7 @@ def test_basic_monte_carlo_euler_bs():
 def test_monte_carlo_euler_bs_randomness():
 
     bs = BlackScholes(0.02, 0.15)
-    euler = EulerBlackScholes(bs)
+    euler = Euler(bs)
 
     montecarlo1 = MonteCarlo(euler)
     montecarlo2 = MonteCarlo(euler)
@@ -102,7 +99,7 @@ def test_monte_carlo_heston_requires_v0():
 def test_monte_carlo_zero_time_raises():
 
     bs = BlackScholes(0.02, 0.15)
-    montecarlo = MonteCarlo(EulerBlackScholes(bs))
+    montecarlo = MonteCarlo(Euler(bs))
 
     with pytest.raises(ValueError):
         montecarlo.generate(100, 12, 0, 3)
@@ -143,7 +140,7 @@ def test_qe_psi_threshold_bounds():
 def test_monte_carlo_negative_seed_raises():
 
     bs = BlackScholes(0.02, 0.15)
-    montecarlo = MonteCarlo(EulerBlackScholes(bs))
+    montecarlo = MonteCarlo(Euler(bs))
 
     with pytest.raises(ValueError):
         montecarlo.configure(seed=-1)
@@ -213,7 +210,7 @@ def test_mc_dupire():
 
     dupire = Dupire(r,q, surface)
 
-    euler_dupire = EulerDupire(dupire)
+    euler_dupire = Euler(dupire)
 
     mc = MonteCarlo(euler_dupire)
 
@@ -225,7 +222,5 @@ def test_mc_dupire():
     assert(sim.n_steps == 253)
     
     S = sim.spot_values()
-    V = sim.var_values()
-
     assert np.all(S > 0)
-    assert np.all(V > 0)
+

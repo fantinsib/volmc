@@ -1,6 +1,8 @@
 import pytest
-from volmc import OptionContract, CallPayoff, PutPayoff, Barrier, Instrument
-from volmc import Euler, BlackScholes, MonteCarlo
+from volmc.options import *
+from volmc.models import BlackScholes
+from volmc.schemes import Euler
+from volmc.pricing import MonteCarlo
 import numpy as np
 
 

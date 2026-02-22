@@ -9,7 +9,7 @@ r"""
 
 
 import pytest
-from volmc import LocalVolatilitySurface
+from volmc.types import LocalVolatilitySurface
 
 def make_inputs():
     s = [80, 90, 100, 110, 120]

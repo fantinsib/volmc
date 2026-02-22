@@ -1,5 +1,6 @@
 import pytest
-from volmc import BlackScholes, Heston, LocalVolatilitySurface, Dupire, Vasicek
+from volmc.models import *
+from volmc.types import LocalVolatilitySurface
 
 
 def test_black_scholes_constructor_valid():

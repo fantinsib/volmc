@@ -6,8 +6,9 @@ from ._volmc import _EulerHeston, _EulerBlackScholes, _QE, _Scheme, _EulerDupire
 from ._volmc import _MonteCarlo
 from ._volmc import _LocalVolatilitySurface
 from ._volmc import _OptionContract, _Payoff, _PutPayoff, _CallPayoff, _DigitalCallPayoff,_DigitalPutPayoff, _Instrument, _Barrier, _Direction, _Nature
+from ._volmc import _Pricer, _MarketState
 
-
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -469,3 +470,100 @@ class Instrument(_Instrument):
     # Backward-compatible alias
     def compute(self, results: SimulationResult) -> float:
         return self.compute_payoff(results)
+
+def Call(K : float, T : float):
+    """
+    Creates a call option instrument. 
+
+    Parameters
+    ----------
+    K : float
+        The strike price
+    T : float 
+        The time to maturity in years
+    """
+    return Instrument(OptionContract(K, T), CallPayoff())
+
+def Put(K : float, T : float):
+    """
+    Creates a put option instrument. 
+    
+    Parameters
+    ----------
+    K : float
+        The strike price
+    T : float 
+        The time to maturity in years
+    """
+    return Instrument(OptionContract(K, T), PutPayoff()) 
+
+def DigitalCall(K : float, T : float):
+    """
+    Creates a put option instrument. 
+    
+    Parameters
+    ----------
+    K : float
+        The strike price
+    T : float 
+        The time to maturity in years
+    """
+    return Instrument(OptionContract(K, T), DigitalCallPayoff()) 
+
+def DigitalPut(K : float, T : float):
+    """
+    Creates a put option instrument. 
+    
+    Parameters
+    ----------
+    K : float
+        The strike price
+    T : float 
+        The time to maturity in years
+    """
+    return Instrument(OptionContract(K, T), DigitalPutPayoff()) 
+
+class MarketState(_MarketState):
+    def __init__(self, S: float, r: float, v0 : float | None = None):
+        """
+        Representation of the state of the market at pricing time
+
+        Parameters
+        ----------
+        S : float
+            Spot price
+        r : float
+            Risk free rate
+        v0 : float | None
+            Optional initial volatility if required by the pricing engine
+        """
+        super().__init__(S, r, v0)
+
+class Pricer(_Pricer):
+    def __init__(self, instrument : Instrument, engine : MonteCarlo):
+        """
+        Pricing engine for a financial instrument.
+
+        Parameters
+        ----------
+        instrument : Instrument
+            The instrument to price
+        engine : MonteCarlo
+            The Monte Carlo engine to be used for pricing
+        """
+        super().__init__(instrument, engine)
+
+    def price(self, marketstate : MarketState, n_steps : int, n_paths : int):
+        """
+        Returns the Monte Carlo simulation price
+
+        Parameters
+        ----------
+        marketstate : MarketState
+            The state of the market at pricing time
+        n_steps : int
+            the number of steps in each path
+        n_paths : int
+            The number of path to simulate
+        """
+        return self._compute_price(marketstate, n_steps, n_paths)

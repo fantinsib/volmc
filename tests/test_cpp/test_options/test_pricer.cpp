@@ -70,7 +70,8 @@ TEST_CASE("Pricer : construction") {
     MonteCarlo engine(euler);
     engine.configure(1, -1);
 
-    Pricer pricer(european_call, engine);
+    Pricer pricer(std::make_shared<Instrument>(european_call),
+                std::make_shared<MonteCarlo>(engine));
     
 
 };
@@ -94,7 +95,10 @@ TEST_CASE("Pricer : basic pricing with vol = 0") {
     MonteCarlo engine(euler);
     engine.configure(1, -1);
 
-    Pricer pricer(european_call, engine);
+    
+    Pricer pricer(std::make_shared<Instrument>(european_call),
+                std::make_shared<MonteCarlo>(engine));
+    
 
     MarketState mstate(S0, r);
 
@@ -125,7 +129,10 @@ TEST_CASE("Pricer : basic pricing with volatility") {
     MonteCarlo engine(euler);
     engine.configure(1, -1);
 
-    Pricer pricer(european_put, engine);
+    
+    Pricer pricer(std::make_shared<Instrument>(european_put),
+                std::make_shared<MonteCarlo>(engine));
+    
 
     MarketState mstate(S0, r);
 
@@ -154,7 +161,10 @@ TEST_CASE("Pricer : delta computation") {
     MonteCarlo engine(euler);
     engine.configure(1, -1);
 
-    Pricer pricer(call, engine);
+    
+    Pricer pricer(std::make_shared<Instrument>(call),
+                std::make_shared<MonteCarlo>(engine));
+    
 
     MarketState mstate(S0, r);
 
@@ -182,7 +192,10 @@ TEST_CASE("Pricer : delta computation with randomness") {
     MonteCarlo engine(euler);
 
     engine.configure(1, -1);
-    Pricer pricer(call, engine);
+    
+    Pricer pricer(std::make_shared<Instrument>(call),
+                std::make_shared<MonteCarlo>(engine));
+    
 
     MarketState mstate(S0, r);
 
@@ -211,13 +224,16 @@ TEST_CASE("Pricer : gamma computation") {
     MonteCarlo engine(euler);
     engine.configure(1, -1);
 
-    Pricer pricer(call, engine);
+    
+    Pricer pricer(std::make_shared<Instrument>(call),
+                std::make_shared<MonteCarlo>(engine));
+    
 
     MarketState mstate(S0, r);
-/*
+
     double mc_gamma = pricer.compute_gamma_bar(mstate, 252, 10000,1e-1);
 
     double call_gamma_val = gamma(S0, K, T, sigma, r);
 
-    REQUIRE(mc_gamma == Catch::Approx(call_gamma_val).epsilon(0.05));*/
+    REQUIRE(mc_gamma == Catch::Approx(call_gamma_val).epsilon(0.05));
 };

@@ -12,4 +12,5 @@ PYBIND11_MODULE(_volmc, m) {
     qe::pybind::bind_engine(m);
     qe::pybind::bind_surface(m);
     qe::pybind::bind_options(m);
+    qe::pybind::bind_pricer(m);
 }

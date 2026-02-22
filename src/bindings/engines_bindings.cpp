@@ -1,3 +1,4 @@
+#include <memory>
 #include <pybind11/attr.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -12,7 +13,7 @@ namespace qe::pybind {
 
 void bind_engine(py::module_& m) {
     
-    py::class_<MonteCarlo>(m, "_MonteCarlo")
+    py::class_<MonteCarlo, std::shared_ptr<MonteCarlo>>(m, "_MonteCarlo")
         .def(py::init<std::shared_ptr<Scheme> >(),
             py::arg("scheme"),
             py::keep_alive<1,2>())

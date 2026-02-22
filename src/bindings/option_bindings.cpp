@@ -52,7 +52,7 @@ void bind_options(py::module_& m){
             py::arg("nature"),
             py::arg("payoff"));
 
-    py::class_<Instrument>(m, "_Instrument")
+    py::class_<Instrument, std::shared_ptr<Instrument>>(m, "_Instrument")
         .def(py::init<OptionContract, std::shared_ptr<Payoff>>())
         .def("_compute_payoff",
             [](const Instrument& self, const SimulationResult& res){

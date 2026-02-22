@@ -10,6 +10,7 @@
 #include "types/marketstate.h"
 #include "engine/montecarlo.hpp"
 #include "engine/engine.hpp"
+#include <memory>
 #include <unordered_map>
 
 struct PricingResult {
@@ -24,7 +25,7 @@ struct PricingResult {
 class Pricer {
 
     public:
-    Pricer(Instrument& instrument, MonteCarlo& generator);
+    Pricer(std::shared_ptr<Instrument> instrument, std::shared_ptr<MonteCarlo> generator);
 
     /**
      * @brief Performs a Monte Carlo simulation for the instrument and returns
@@ -35,7 +36,7 @@ class Pricer {
      * @param n_paths The number of paths to simulate
      * @return double The estimated price
      */
-    double compute_price(const MarketState& market_state, int n_steps, int n_paths);
+    double compute_price(const MarketState& market_state, int n_steps, int n_paths) const;
     
     /**
      * @brief Performs a Monte Carlo simulation for the instrument and returns 
@@ -74,8 +75,8 @@ class Pricer {
 
     private:
 
-    MonteCarlo& generator_;
-    Instrument& instrument_;
+    std::shared_ptr<MonteCarlo> generator_;
+    std::shared_ptr<Instrument> instrument_;
 
 
 

@@ -1,5 +1,8 @@
 import pytest
-from volmc import BlackScholes, Heston, LocalVolatilitySurface, Dupire, Vasicek, Euler, EulerDupire, MonteCarlo, QE
+from volmc.models import *
+from volmc.types import LocalVolatilitySurface
+from volmc.schemes import Euler, QE
+from volmc.pricing import MonteCarlo
 
 def make_inputs():
     s = [80, 90, 100, 110, 120]
