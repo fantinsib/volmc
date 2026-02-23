@@ -32,9 +32,9 @@ class EulerHeston : public Scheme
     * @param S0 the spot at time 0
     * @param v0 optional : the volatility at time 0 - required for Heston 
     * 
-    * @return State : a State object representing the initial state
+    * @return double : S at time 0
     */
-    State init_state(double S0, std::optional<double> v0) const override;
+    std::pair<double, double> init_state(double S0, std::optional<double> v0) const override;
 
     /**
     * @brief Generates a new Heston spot value and volatility level 
@@ -45,8 +45,8 @@ class EulerHeston : public Scheme
     * @param i the current step of the generation process
     * @param dt the time step
     * @param rng the random number generator
-    * @return State : a State object containing the new spot price
+    * @return double : the next step in the spot process
     */
-    State step(const State& state, int i, float dt, std::mt19937& rng) const override;
+    std::pair<double, double> step(const double S, const double v, int i, float dt, std::mt19937& rng) const override;
 
 };

@@ -10,12 +10,11 @@ Dupire::Dupire(float r, float q,
 
 {}
 
-double Dupire::drift(double t, const State &state) const {
-    return (r_ - q_)*state.at(0);
+double Dupire::drift(double t, const double S) const {
+    return (r_ - q_)*S;
 }
 
-double Dupire::diffusion(double t, const State &state) const {
-    double S = state.at(0);
+double Dupire::diffusion(double t, const double S) const {
     return lv_surface_->sigma(t, S)*S;
 }
 

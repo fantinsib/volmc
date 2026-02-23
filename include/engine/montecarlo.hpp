@@ -12,6 +12,7 @@
 #include <memory>
 #include <optional>
 #include <random>
+#include <vector>
 #include "types/path.hpp"
 #include "types/simulationresult.hpp"
 
@@ -53,28 +54,44 @@ public:
      * @param n the number of steps 
      * @param T the time horizon
      * @param v0 optional initial volatility 
-     * @return Path object
+     * @return std::vector 
      */
-    Path simulate_path(float S0, size_t n, float T, std::mt19937& rng,std::optional<float> v0 = std::nullopt);
+    std::vector<double> simulate_path(double S0, size_t n, float T, std::mt19937& rng,std::optional<float> v0 = std::nullopt);
+
 
     /**
-     * @brief Simulates n_paths paths that follow the scheme.  
+     * @brief Generates a path and insert it directly in 
+     * the main path vector
+     * 
+     * @param path a pointer to the nth path position in the main path vector
+     * @param S0 initial spot
+     * @param n number of steps
+     * @param T time to maturity in years
+     * @param rng random number generator 
+     * @param v0 optionnal initial volatility
+     */
+    void generate_path_inplace(double* path, double S0, size_t n, double T, std::mt19937& rng, std::optional<double> v0);
+    
+    /**
+     * @brief Simulates n_paths paths that follow the spot process.  
      * 
      * @param S0 the initial spot
      * @param n the number of steps
      * @param T the time horizon
      * @param n_path the number of paths to simulate
      * @param v0 the initial volatility 
-     * @return SimulationResult 
+     * @return SimulationResult
      */
-    SimulationResult generate(float S0, size_t n, float T, size_t n_path, std::optional<float> v0 = std::nullopt);
+    SimulationResult generate_spot(float S0, size_t n, float T, size_t n_path, std::optional<double> v0 = std::nullopt);
     
     /**
      * @brief Method allowing to configure the engine 
      * 
      * @param seed : the seed to be used for the generation
      */
-    void configure(std::optional<int> seed = std::nullopt, std::optional<int> n_jobs = std::nullopt);
+    void configure(std::optional<int> seed = std::nullopt, 
+                   std::optional<int> n_jobs = std::nullopt, 
+                   std::optional<bool> return_variance = std::nullopt);
     
     //returns the current seed
     int get_seed() {return seed_;}
@@ -96,7 +113,8 @@ public:
     size_t seed_;
     std::mt19937 rng_;
     int n_jobs_ = 1;
-    bool user_set_seed_ = false; 
+    bool user_set_seed_ = false;
+    bool return_variance_ = false; 
 
     
 };

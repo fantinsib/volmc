@@ -6,6 +6,7 @@
 #include <random>
 #include <cmath>
 #include <stdexcept>
+#include <utility>
 
 
 
@@ -23,54 +24,53 @@ void QE::set_psi_c(float p){
 };
 
 
-State QE::init_state(double S0, std::optional<double> v0) const {
+std::pair<double, double> QE::init_state(double S0, std::optional<double> v0) const {
 
     if (!v0.has_value()) throw std::invalid_argument("QE::init_state : intial state must receive a value for initial volatility");
-    State state{S0, v0};
-    return state;
+    std::pair res(S0, v0.value());
+    return res;
 }
 
 
-State QE::step(const State& state, 
+std::pair<double, double> QE::step(const double S, double v, 
                         int i, 
                         float dt, 
                         std::mt19937& rng) const 
 {
 
-    if (!state.holds_var()) throw std::invalid_argument("QE::step : the received state has no variance");
-    std::normal_distribution<float> N;
-    std::uniform_real_distribution<float> U(0.0f, 1.0f);
+    std::normal_distribution<double> N;
+    std::uniform_real_distribution<double> U(0.0f, 1.0f);
 
-    float S = state.at(0);
-    float V = state.at(1);
-    float exp_sp = std::exp(-model_.kappa * dt);
+    
+    double V = v*v;
+    double exp_sp = std::exp(-model_.kappa * dt);
 
-    float E_X = model_.theta + (V- model_.theta) * exp_sp;
+    double E_X = model_.theta + (V- model_.theta) * exp_sp;
 
-    float VAR_X1 = (V * 
+    double VAR_X1 = (V * 
                     (model_.epsilon*model_.epsilon) * exp_sp) *
                     (1-exp_sp)
                     /model_.kappa;
 
-    float VAR_X2 = ((model_.theta * model_.epsilon * model_.epsilon) *
+    double VAR_X2 = ((model_.theta * model_.epsilon * model_.epsilon) *
                     (1-exp_sp) * 
                     (1-exp_sp))
                     /(2*model_.kappa);
 
-    float VAR_X = VAR_X1 + VAR_X2;
+    double VAR_X = VAR_X1 + VAR_X2;
 
-    float psi = VAR_X/(E_X*E_X);
-    float u = U(rng);
-    float logSt;
-    float V_next;
-    float Z = N(rng);
+    double psi = VAR_X/(E_X*E_X);
+    double u = U(rng);
+    double logSt;
+    double V_next;
+    double Z = N(rng);
 
     if (psi > psi_threshold_) { //exp regime
         
-        float p = (psi-1)/(psi+1);
-        float beta = (1-p)/E_X;
+        double p = (psi-1)/(psi+1);
+        double beta = (1-p)/E_X;
         V_next = inv_psi(u, p, beta);
-        float V_int = 0.5 * (V+V_next);
+        double V_int = 0.5 * (V+V_next);
 
         logSt = std::log(S) + 
                 model_.mu * dt - 
@@ -83,14 +83,14 @@ State QE::step(const State& state,
 
     else { //quadratic regime 
 
-        float zq = N(rng);
-        float dpsi = 2.0f/psi;
-        float b_2 = dpsi - 1 + std::sqrt(dpsi*(dpsi-1));
-        float a = E_X/(1+b_2);
+        double zq = N(rng);
+        double dpsi = 2.0f/psi;
+        double b_2 = dpsi - 1 + std::sqrt(dpsi*(dpsi-1));
+        double a = E_X/(1+b_2);
 
-        float sqrt_b2 = std::sqrt(b_2);
+        double sqrt_b2 = std::sqrt(b_2);
         V_next = a * (zq + sqrt_b2) * (zq + sqrt_b2);
-        float V_int = 0.5 * (V + V_next);
+        double V_int = 0.5 * (V + V_next);
         logSt = std::log(S) + 
                 model_.mu * dt - 
                 0.5 * V_int * dt + 
@@ -101,7 +101,7 @@ State QE::step(const State& state,
                
     }
 
-    return State{std::exp(logSt), V_next};
+    return std::pair<double, double>(std::exp(logSt), std::sqrt(V_next));
 };
 
 float QE::inv_psi(float u, float p, float beta) const{

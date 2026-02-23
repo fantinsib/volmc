@@ -28,16 +28,16 @@ double Pricer::compute_price(const MarketState& market_state, int n_steps, int n
     bool vol_spec = market_state.has_vol();
     double T = instrument_->get_maturity();
 
-    SimulationResult res;
+
     double payoff;
 
     if (!vol_spec) {
-        res = generator_->generate(S0,  n_steps, T, n_paths);
+        SimulationResult res = generator_->generate_spot(S0,  n_steps, T, n_paths);
         payoff = instrument_->compute_payoff(res);
     }
 
     if (vol_spec) {
-        res = generator_->generate(S0,  n_steps, T, n_paths, market_state.vol());
+        SimulationResult res = generator_->generate_spot(S0,  n_steps, T, n_paths, market_state.vol());
         payoff = instrument_->compute_payoff(res);
     }
 
@@ -63,9 +63,9 @@ double Pricer::compute_delta_bar(const MarketState& market_state, int n_steps, i
     MonteCarlo local_generator = *generator_; //to avoid changing the user's rng state
 
     local_generator.reset_rng();
-    SimulationResult res_p = local_generator.generate(S0_p,  n_steps, T, n_paths);
+    SimulationResult res_p = local_generator.generate_spot(S0_p,  n_steps, T, n_paths);
     local_generator.reset_rng();
-    SimulationResult res_m = local_generator.generate(S0_m,  n_steps, T, n_paths);
+    SimulationResult res_m = local_generator.generate_spot(S0_m,  n_steps, T, n_paths);
     double payoff_p = instrument_->compute_payoff(res_p);
     double payoff_m = instrument_->compute_payoff(res_m);
     double price_p = payoff_p * std::exp(-r*T);
@@ -90,11 +90,11 @@ double Pricer::compute_gamma_bar(const MarketState& market_state, int n_steps, i
     MonteCarlo local_generator = *generator_; //to avoid changing the user's rng state
 
     local_generator.reset_rng();
-    SimulationResult res_p = local_generator.generate(S0_p,  n_steps, T, n_paths);
+    SimulationResult res_p = local_generator.generate_spot(S0_p,  n_steps, T, n_paths);
     local_generator.reset_rng();
-    SimulationResult res_m = local_generator.generate(S0_m,  n_steps, T, n_paths);
+    SimulationResult res_m = local_generator.generate_spot(S0_m,  n_steps, T, n_paths);
     local_generator.reset_rng();
-    SimulationResult res = local_generator.generate(S0,  n_steps, T, n_paths);
+    SimulationResult res = local_generator.generate_spot(S0,  n_steps, T, n_paths);
     double payoff_p = instrument_->compute_payoff(res_p);
     double payoff_m = instrument_->compute_payoff(res_m);
     double payoff = instrument_->compute_payoff(res);

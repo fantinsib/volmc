@@ -9,29 +9,31 @@
 #include <cmath>
 #include <stdexcept>
 #include <algorithm> 
+#include <utility>
 
 
 
-State EulerHeston::init_state(double S0, std::optional<double> v0) const {
+std::pair<double, double> EulerHeston::init_state(double S0, std::optional<double> v0) const {
     
     if (!v0.has_value()) throw std::invalid_argument("EulerHeston::init_state : intial state must receive a value for initial variance");
     if (v0.value() < 0) throw std::invalid_argument("EulerHeston::init_state : intial variance can't be negative");
-    State state{S0, v0};
-    return state;
+    std::pair<double, double> res(S0, v0.value());
+    return res;
 }
 
 
 
-State EulerHeston::step(const State& state, 
-                        int i,
-                        float dt, 
-                        std::mt19937& rng) const 
+std::pair<double, double> EulerHeston::step(const double S,
+                            const double v, 
+                            int i,
+                            float dt, 
+                            std::mt19937& rng) const 
                         
 {
-    if (!state.holds_var()) throw std::invalid_argument("EulerBlackScholes::step : the received state has no variance");
+
     if (dt <= 0) throw std::invalid_argument("EulerBlackScholes::step : dt must be stricltly positive");
-    float logS = std::log(state.at(0));    
-    float V = (state.at(1));
+    float logS = std::log(S);    
+    float V = (v*v);
 
     std::normal_distribution<float> dist;
 
@@ -49,5 +51,5 @@ State EulerHeston::step(const State& state,
                     + (model.mu - 0.5*std::max(V, 0.f)) * dt 
                     + sqrt_v * sqrt_dt * Z_s;
 
-    return State{std::exp(logSt), Vt};
+    return std::pair<double, double>(std::exp(logSt), std::sqrt(Vt));
 }
