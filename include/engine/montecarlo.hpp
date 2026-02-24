@@ -63,14 +63,15 @@ public:
      * @brief Generates a path and insert it directly in 
      * the main path vector
      * 
-     * @param path a pointer to the nth path position in the main path vector
+     * @param s_path a pointer to the nth path position in the main spot path vector
+     * @param v_path a pointer to the nth path position in the main vol path vector
      * @param S0 initial spot
      * @param n number of steps
      * @param T time to maturity in years
      * @param rng random number generator 
      * @param v0 optionnal initial volatility
      */
-    void generate_path_inplace(double* path, double S0, size_t n, double T, std::mt19937& rng, std::optional<double> v0);
+    void generate_path_inplace(double* s_path, double* v_path, double S0, size_t n, double T, std::mt19937& rng, std::optional<double> v0);
     
     /**
      * @brief Simulates n_paths paths that follow the spot process.  
@@ -91,7 +92,7 @@ public:
      */
     void configure(std::optional<int> seed = std::nullopt, 
                    std::optional<int> n_jobs = std::nullopt, 
-                   std::optional<bool> return_variance = std::nullopt);
+                   std::optional<bool> return_volatility = std::nullopt);
     
     //returns the current seed
     int get_seed() {return seed_;}
@@ -114,7 +115,7 @@ public:
     std::mt19937 rng_;
     int n_jobs_ = 1;
     bool user_set_seed_ = false;
-    bool return_variance_ = false; 
+    bool return_volatility_ = true; 
 
     
 };

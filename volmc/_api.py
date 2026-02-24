@@ -103,11 +103,11 @@ class SimulationResult:
         """
         return self.res.spot
     
-    def var_values(self):
+    def vol_values(self):
         """
         Returns a numpy matrix of the variance processes (one row = one process)
         """
-        return self.res.var
+        return self.res.vol
     
     def mean_terminal_spot(self):
         """

@@ -4,6 +4,7 @@
 #include "path.hpp"
 #include "models/model.hpp"
 #include "schemes/schemes.hpp"
+#include <optional>
 #include <stdexcept>
 #include <vector>
 #include <memory>
@@ -26,7 +27,7 @@ struct SimulationResult {
      * @param n_paths the nuùber of paths of the generation
      */
     SimulationResult(std::shared_ptr<std::vector<double>> paths, size_t seed,
-                    size_t n_steps, size_t n_paths);
+                    size_t n_steps, size_t n_paths, std::optional<std::shared_ptr<std::vector<double>>> v_paths = std::nullopt);
     size_t get_npaths() const {return n_paths_;}
     size_t get_seed() const {return origin_seed_;}
     size_t get_nsteps() const {return n_steps_;}

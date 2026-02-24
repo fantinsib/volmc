@@ -11,7 +11,9 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>  
 #include <memory>
+#include <optional>
 #include <random>
+#include <stdexcept>
 #include "models/black_scholes/black_scholes.hpp"
 #include "models/heston/heston.hpp"
 #include "models/dupire/dupire.hpp"
@@ -30,7 +32,7 @@ TEST_CASE("Monte Carlo - BlackScholes & Euler - basic usage"){
     Euler eu_scheme(std::make_shared<BlackScholes>(bs));
     MonteCarlo mc(eu_scheme);
 
-    mc.configure(1);
+    mc.configure(1, 1, true);
 
     std::mt19937 rng;
 
@@ -45,10 +47,15 @@ TEST_CASE("Monte Carlo - BlackScholes & Euler - basic usage"){
     REQUIRE(results.get_seed() == 1);
 
     const std::vector<double> spots = results.get_paths();
+    const std::vector<double> vols  = results.get_vol();
     REQUIRE(spots[0]== 100.0f);
     for (float i : spots){
         REQUIRE(i > 0);
     }
+    for (float j : vols){
+        REQUIRE(j == Catch::Approx(0.1));
+    }
+    
         
 }
 
@@ -177,15 +184,48 @@ TEST_CASE("Monte Carlo - Heston & Euler - basic usage"){
     Heston heston{0.02, 2, 0.05, 0.4, -0.5};
     EulerHeston eu_scheme(heston);
     MonteCarlo mc(eu_scheme);
-
-    mc.configure(1);
     std::mt19937 rng;
 
-    std::vector<double> simulation= mc.simulate_path(100, 252, 1, rng, 0.2);
+    SECTION("Simulate path"){
+        mc.configure(1);
 
-    REQUIRE(simulation.size() == 253);
-    REQUIRE(simulation.back() != 100);
 
+        std::vector<double> path= mc.simulate_path(100, 252, 1, rng, 0.2);
+
+        REQUIRE(path.size() == 253);
+        REQUIRE(path.back() != 100);
+    }
+
+    SECTION("Generate"){
+        mc.configure(1, 1, true);
+        size_t n_paths = 5;
+        size_t n_steps = 10;
+
+        REQUIRE_THROWS_AS(mc.generate_spot(100, 252, 1, 100), std::invalid_argument);
+        SimulationResult simulation = mc.generate_spot(100, n_steps, 1, n_paths, 0.2);
+
+        REQUIRE(simulation.get_path_size() == n_steps +1);
+        REQUIRE(simulation.get_nsteps() == n_steps);
+        
+        const std::vector<double>& spots = simulation.get_paths();
+        const std::vector<double>& vols = simulation.get_vol();
+
+        REQUIRE(spots.size() == (n_paths)*(n_steps+1));
+        REQUIRE(spots.size() == vols.size());
+
+        REQUIRE(spots[0] == 100.0);
+        REQUIRE(vols[0] == 0.2);
+
+        for (double s : spots) {
+            REQUIRE(s > 0);
+        }
+
+        for (double v : vols) {
+            REQUIRE(v >= 0);
+        }
+
+
+    }
 }
 
 TEST_CASE("Monte Carlo - Heston & Euler - Randomness"){
@@ -199,9 +239,9 @@ TEST_CASE("Monte Carlo - Heston & Euler - Randomness"){
 
     std::mt19937 rng;
 
-    mc1.configure(1);
-    mc2.configure(1);
-    mc3.configure(2);
+    mc1.configure(1, 1, true);
+    mc2.configure(1, 1, true);
+    mc3.configure(2, 1, true);
 
     SimulationResult simulation1= mc1.generate_spot(100, 252, 1, 1, 0.2);
     SimulationResult simulation2= mc2.generate_spot(100, 252, 1, 1, 0.2);

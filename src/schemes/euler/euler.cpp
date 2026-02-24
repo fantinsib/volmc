@@ -8,7 +8,7 @@
 
 std::pair<double, double> Euler::init_state(double S0, std::optional<double> v0) const {
     if (v0.has_value()) return std::pair<double, double>(S0, v0.value());
-    else return std::pair<double, double>(S0, 0.0); 
+    else return std::pair<double, double>(S0, model_->volatility(0, S0)); 
 }
 
 std::pair<double, double> Euler::step(const double S, const double v,int i, float dt, std::mt19937& rng) const {

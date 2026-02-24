@@ -87,7 +87,7 @@ void bind_types(py::module_& m) {
             const auto& r = self.cast<const SimulationResult&>();
             return spot_view(self, r);
         })
-        .def_property_readonly("var", [](py::object self) {
+        .def_property_readonly("vol", [](py::object self) {
             const auto& r = self.cast<const SimulationResult&>();
             return vol_view(self, r);
         });

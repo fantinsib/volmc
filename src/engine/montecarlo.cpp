@@ -13,6 +13,7 @@
 #include <thread>
 #include <omp.h>
 #include <utility>
+#include <vector>
 
 
 
@@ -39,19 +40,33 @@ std::vector<double> MonteCarlo::simulate_path(double S0,
 }
 
 
-void MonteCarlo::generate_path_inplace(double* path, double S0, size_t n, double T, 
+void MonteCarlo::generate_path_inplace(double* s_path, double* v_path, double S0, size_t n, double T, 
                                        std::mt19937& rng, std::optional<double> v0) {
     double dt = T / static_cast<double>(n-1);
     std::pair<double, double> state = scheme_->init_state(S0, v0);
     
-    path[0] = state.first;
     
-    for (size_t step = 1; step < n; ++step) {
-        double S_t = state.first;
-        double v_t = state.second;
-        state = scheme_->step(S_t, v_t, step, dt, rng);
-        path[step] = state.first;
+    
+    if (return_volatility_ == false){
+        s_path[0] = state.first;
+        for (size_t step = 1; step < n; ++step) {
+            double S_t = state.first;
+            double v_t = state.second;
+            state = scheme_->step(S_t, v_t, step, dt, rng);
+            s_path[step] = state.first;
+        }
     }
+    else{
+        s_path[0] = state.first;
+        v_path[0] = state.second;
+        for (size_t step = 1; step < n; ++step) {
+            double S_t = state.first;
+            double v_t = state.second;
+            state = scheme_->step(S_t, v_t, step, dt, rng);
+            s_path[step] = state.first;
+            v_path[step] = state.second;
+        }
+        }
 }
 
 
@@ -61,7 +76,8 @@ SimulationResult MonteCarlo::generate_spot(float S0,
                                       float T, 
                                       size_t n_paths, std::optional<double> v0){
     
-    std::vector<double> all_paths(n_paths*(n+1));
+    std::vector<double> s_all_paths(n_paths*(n+1));
+    std::vector<double> v_all_paths(n_paths*(n+1));
     std::exception_ptr eptr = nullptr;
 
     std::vector<size_t> seeds_vector(n_paths);
@@ -73,8 +89,9 @@ SimulationResult MonteCarlo::generate_spot(float S0,
     for (size_t p = 0; p < n_paths; p++){
         try {
             std::mt19937 rng(static_cast<unsigned int>(seeds_vector[p]));
-                double* path_ptr = &all_paths[p * (n + 1)];
-                generate_path_inplace(path_ptr, S0, n+1, T, rng, v0);
+                double* s_path_ptr = &s_all_paths[p * (n + 1)];
+                double* v_path_ptr = &v_all_paths[p * (n + 1)];
+                generate_path_inplace( s_path_ptr, v_path_ptr, S0, n+1, T, rng, v0);
             }
         catch(...) {
             #pragma omp critical 
@@ -85,10 +102,12 @@ SimulationResult MonteCarlo::generate_spot(float S0,
     }
     if (eptr) std::rethrow_exception(eptr);
 
-    return SimulationResult(std::make_shared<std::vector<double>>(all_paths), seed_,  n, n_paths); 
+    if (return_volatility_) return SimulationResult(std::make_shared<std::vector<double>>(s_all_paths), seed_,  n, n_paths, std::make_shared<std::vector<double>>(v_all_paths)); 
+    else return SimulationResult(std::make_shared<std::vector<double>>(s_all_paths), seed_,  n, n_paths); 
+
 }
 
-void MonteCarlo::configure(std::optional<int> seed, std::optional<int> n_jobs, std::optional<bool> return_variance){
+void MonteCarlo::configure(std::optional<int> seed, std::optional<int> n_jobs, std::optional<bool> return_volatility){
 
     if (seed.has_value()) {
         if (seed.value()<0) throw std::invalid_argument("MonteCarlo::configure : seed value must be positive");
@@ -105,7 +124,7 @@ void MonteCarlo::configure(std::optional<int> seed, std::optional<int> n_jobs, s
         else (n_jobs_ = n_jobs.value());
     }
 
-    if (return_variance.has_value()) {
-        return_variance_ = return_variance.value();
+    if (return_volatility.has_value()) {
+        return_volatility_ = return_volatility.value();
     }
 }
