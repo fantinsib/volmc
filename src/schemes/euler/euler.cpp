@@ -12,7 +12,7 @@ std::pair<double, double> Euler::init_state(double S0, std::optional<double> v0)
 }
 
 std::pair<double, double> Euler::step(const double S, const double v,int i, float dt, std::mt19937& rng) const {
-    if (dt <= 0) throw std::invalid_argument("EulerBlackScholes::step : dt must be stricltly positive");
+    if (dt <= 0) throw std::invalid_argument("Euler::step : dt must be stricltly positive");
 
     std::normal_distribution<double> dist;
     double Z = dist(rng);

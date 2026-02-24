@@ -33,10 +33,14 @@ struct SimulationResult {
     const std::vector<double>& get_paths() const {
         return *paths_;
     }
+    const std::vector<double>& get_vol() const {
+        return *vols_;
+    }
 
 
     private :
         std::shared_ptr<std::vector<double>> paths_;
+        std::shared_ptr<std::vector<double>> vols_;
         const size_t origin_seed_;
         const size_t n_paths_;
         const size_t n_steps_;

@@ -11,6 +11,7 @@
 #include <catch2/catch_approx.hpp>  
 #include <optional>
 #include <stdexcept>
+#include <utility>
 #include "models/heston/heston.hpp"
 #include "schemes/qe.hpp"
 
@@ -23,10 +24,11 @@ TEST_CASE("Scheme - QE"){
 
     std::mt19937 rng;
     float dt = 0.1;
-    State init{100, 0.2};
 
-    State S{qe.step(init, 0, dt, rng)};
-    REQUIRE(S.at(0));
+
+    std::pair<double, double> state = qe.step(100, 0.2,0, dt, rng);
+    REQUIRE(state.first);
+    REQUIRE(state.second);
     }
 
     SECTION("Constructor Error - Heston"){
@@ -36,10 +38,10 @@ TEST_CASE("Scheme - QE"){
 
     std::mt19937 rng;
     float dt = 0.1;
-    State init{100, 0.2};
+    std::pair<double, double> init{100, 0.2};
 
-    State S{qe.step(init, 0, dt, rng)};
-    REQUIRE(S.at(0));
+    std::pair<double, double> S = qe.step(init.first, init.second, 0, dt, rng);
+    REQUIRE(S.first != 100.0);
     }
 
     }
@@ -50,9 +52,9 @@ TEST_CASE("Scheme - QE"){
         QE qe{heston};
 
         REQUIRE_THROWS_AS(qe.init_state(100.0f, std::nullopt), std::invalid_argument);
-        State state = qe.init_state(100.0f, 0.2f);
-        REQUIRE(state.at(0) == Catch::Approx(100.0f));
-        REQUIRE(state.at(1) > 0);
+        std::pair<double, double> state = qe.init_state(100.0f, 0.2f);
+        REQUIRE(state.first == Catch::Approx(100.0f));
+        REQUIRE(state.second > 0);
     }
 
     SECTION("Psi threshold bounds"){
@@ -83,9 +85,9 @@ TEST_CASE("Scheme - QE"){
 
         std::mt19937 rng;
         float dt = 0.1;
-        State init{100};
+        std::pair<double, double> init(100, 0.3);
 
-        REQUIRE_THROWS_AS(qe.step(init, 0, dt, rng), std::invalid_argument);
+        REQUIRE_THROWS_AS(qe.step(init.first, init.second, 0, dt, rng), std::invalid_argument);
     }
 
 }

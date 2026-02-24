@@ -7,10 +7,10 @@
 #include <cmath>
 
 #include "models/black_scholes/black_scholes.hpp"
+#include "schemes/euler.h"
 #include "options/options.hpp"
 #include "payoff/payoff.h"
 #include "instruments/instrument.h"
-#include "schemes/eulerblackscholes.hpp"
 #include "engine/montecarlo.hpp"
 #include "types/simulationresult.hpp"
 #include <catch2/catch_test_macros.hpp>
@@ -68,12 +68,12 @@ TEST_CASE("European option - basic pricing with vol = 0") {
     Instrument european_call(contract, std::make_unique<CallPayoff>());
 
     BlackScholes bs(r, sigma);
-    EulerBlackScholes euler(bs);
+    Euler euler(std::make_shared<BlackScholes>(bs));
 
     MonteCarlo engine(euler);
     engine.configure(1, -1);
 
-    SimulationResult res = engine.generate(S0, 252, T, 100);
+    SimulationResult res = engine.generate_spot(S0, 252, T, 100);
 
     double payoff = european_call.compute_payoff(res);
 
@@ -101,12 +101,12 @@ TEST_CASE("European option - basic pricing with volatility") {
     Instrument european_put(contract, std::make_unique<PutPayoff>());
 
     BlackScholes bs(r, sigma);
-    EulerBlackScholes euler(bs);
+    Euler euler(std::make_shared<BlackScholes>(bs));
 
     MonteCarlo engine(euler);
     engine.configure(1, -1);
 
-    SimulationResult res = engine.generate(S0, 252, T, 10000);
+    SimulationResult res = engine.generate_spot(S0, 252, T, 10000);
 
     double payoff = european_put.compute_payoff(res);
 

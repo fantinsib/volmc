@@ -17,7 +17,7 @@ void bind_engine(py::module_& m) {
         .def(py::init<std::shared_ptr<Scheme> >(),
             py::arg("scheme"),
             py::keep_alive<1,2>())
-        .def("_generate", &MonteCarlo::generate,
+        .def("_generate", &MonteCarlo::generate_spot,
             py::arg("S0"),
             py::arg("n"),
             py::arg("T"),
@@ -25,7 +25,8 @@ void bind_engine(py::module_& m) {
             py::arg("v0") = py::none())
         .def("_configure", &MonteCarlo::configure,
             py::arg("seed"),
-            py::arg("n_jobs")
+            py::arg("n_jobs"),
+            py::arg("return_vol")
         );
 }
 

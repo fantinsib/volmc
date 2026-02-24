@@ -11,7 +11,6 @@
 #include "payoff/payoff.h"
 #include "instruments/instrument.h"
 #include "schemes/euler.h"
-#include "schemes/eulerblackscholes.hpp"
 #include "engine/montecarlo.hpp"
 #include "types/marketstate.h"
 #include "types/simulationresult.hpp"
@@ -65,7 +64,7 @@ TEST_CASE("Pricer : construction") {
     Instrument european_call(contract, std::make_unique<CallPayoff>());
 
     BlackScholes bs(r, sigma);
-    EulerBlackScholes euler(bs);
+    Euler euler(std::make_shared<BlackScholes>(bs));
 
     MonteCarlo engine(euler);
     engine.configure(1, -1);
@@ -90,7 +89,7 @@ TEST_CASE("Pricer : basic pricing with vol = 0") {
     Instrument european_call(contract, std::make_unique<CallPayoff>());
 
     BlackScholes bs(r, sigma);
-    EulerBlackScholes euler(bs);
+    Euler euler(std::make_shared<BlackScholes>(bs));
 
     MonteCarlo engine(euler);
     engine.configure(1, -1);
@@ -124,7 +123,7 @@ TEST_CASE("Pricer : basic pricing with volatility") {
     Instrument european_put(contract, std::make_unique<PutPayoff>());
 
     BlackScholes bs(r, sigma);
-    EulerBlackScholes euler(bs);
+    Euler euler(std::make_shared<BlackScholes>(bs));
 
     MonteCarlo engine(euler);
     engine.configure(1, -1);
@@ -188,7 +187,7 @@ TEST_CASE("Pricer : delta computation with randomness") {
     Instrument call(contract, std::make_unique<CallPayoff>());
 
     BlackScholes bs(r, sigma);
-    EulerBlackScholes euler(bs);
+    Euler euler(std::make_shared<BlackScholes>(bs));
     MonteCarlo engine(euler);
 
     engine.configure(1, -1);
@@ -219,7 +218,7 @@ TEST_CASE("Pricer : gamma computation") {
     Instrument call(contract, std::make_unique<CallPayoff>());
 
     BlackScholes bs(r, sigma);
-    EulerBlackScholes euler(bs);
+    Euler euler(std::make_shared<BlackScholes>(bs));
 
     MonteCarlo engine(euler);
     engine.configure(1, -1);
