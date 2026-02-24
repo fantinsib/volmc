@@ -21,6 +21,7 @@ struct SimulationResult {
     size_t get_npaths() const {return n_paths_;}
     size_t get_seed() const {return origin_seed_;}
     size_t get_nsteps() const {return n_steps_;}
+    size_t get_path_size() const {return n_steps_+1;}
 
     /**
      * @brief Returns the average final value of

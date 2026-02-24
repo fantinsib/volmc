@@ -11,10 +11,12 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>  
+#include <cmath>
 #include <memory>
 #include <optional>
 #include <stdexcept>
 #include <utility>
+#include <vector>
 #include "engine/montecarlo.hpp"
 #include "models/black_scholes/black_scholes.hpp"
 #include "models/dupire/dupire.hpp"
@@ -67,8 +69,17 @@ SECTION("No volatility") {
     MonteCarlo engine(euler_bs);
     engine.configure(1, -1);
 
-    SimulationResult sim = engine.generate_spot(100,100, 1.2,10);
-    REQUIRE(sim.avg_terminal_value() == Catch::Approx(100 * exp(0.02 * 1.2)));
+    size_t n_steps = 5;
+    size_t n_paths = 10;
+
+    SimulationResult sim = engine.generate_spot(100,n_steps, 1,n_paths);
+    const std::vector<double>& spots = sim.get_paths();
+    REQUIRE(spots[0] == 100);
+    REQUIRE(spots.size() == (n_steps+1)*n_paths);
+    REQUIRE(bs.volatility(10, 100) == 0.0);
+    REQUIRE(bs.diffusion(10, 100) == 0.0);
+    REQUIRE(sim.avg_terminal_value() ==
+        Catch::Approx(100.0 * std::pow(1.0 + 0.02 * (1.0 / (n_steps)), (n_steps))));
 }
 
 }
@@ -100,7 +111,7 @@ TEST_CASE("Scheme - EulerHeston") {
         float dt = 0.1;
         std::pair<double, double> init{100, 0.0};
 
-        REQUIRE_THROWS_AS(euler_heston.step(init.first, init.second, 0,  dt, rng), std::invalid_argument);
+        REQUIRE_THROWS_AS(euler_heston.init_state(init.first, std::nullopt), std::invalid_argument);
 
     }
 
@@ -144,7 +155,7 @@ SECTION("Constructor") {
 
     std::pair<double, double> state = euler.step(init.first, init.second, 0, dt, rng);
     REQUIRE(state.first != 100);
-    REQUIRE(state.second == 0.0);
+    REQUIRE(state.second == surface->sigma(0, 100));
 }
 
 SECTION("Init state") {

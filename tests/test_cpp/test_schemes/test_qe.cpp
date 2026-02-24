@@ -87,7 +87,7 @@ TEST_CASE("Scheme - QE"){
         float dt = 0.1;
         std::pair<double, double> init(100, 0.3);
 
-        REQUIRE_THROWS_AS(qe.step(init.first, init.second, 0, dt, rng), std::invalid_argument);
+        REQUIRE_THROWS_AS(qe.init_state(init.first, std::nullopt), std::invalid_argument);
     }
 
 }

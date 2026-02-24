@@ -18,7 +18,7 @@ std::pair<double, double> Euler::step(const double S, const double v,int i, floa
     double Z = dist(rng);
     double t = i * dt;
     double vt = model_->volatility(t,S);
-    double St = S + model_->drift(t, S)*dt +model_->diffusion(t, S)*Z * std::sqrt(dt);
+    double St = S + model_->drift(t, S) * dt + model_->diffusion(t,S) *Z * std::sqrt(dt);
 
     return std::pair<double, double>(St, vt);
 
