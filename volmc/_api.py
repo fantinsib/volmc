@@ -291,7 +291,7 @@ class MonteCarlo(_MonteCarlo):
         seed : int
             The seed to be used for randomness
         """
-        self._configure(seed, n_jobs)
+        self._configure(seed, n_jobs, None)
 
 
 class LocalVolatilitySurface(_LocalVolatilitySurface):
