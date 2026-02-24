@@ -13,6 +13,8 @@ struct Model{
     virtual double drift(double t, const double S) const = 0;
     // Virtual function to compute the diffusion given S, var
     virtual double diffusion(double t, const double S) const = 0; 
+    // Virtual function to compute the instantaneous volatility at t, S
+    virtual double volatility(double t, const double S) const = 0;
 
 };
 

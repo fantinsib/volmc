@@ -30,8 +30,8 @@ struct Heston : VectorModel {
 
     bool feller_condition() {return feller;}
 
-    double drift(double t, const State& state) const;
-    double diffusion(double t, const State& state) const;
+    double drift(double t, const double S) const;
+    double diffusion(double t, const double S) const;
 
 
 private:

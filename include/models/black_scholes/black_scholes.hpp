@@ -27,6 +27,8 @@ struct BlackScholes : Model {
     virtual ~BlackScholes() override = default;
     double drift(double t, const double S) const override;
     double diffusion(double t, const double S) const override;
+    double volatility(double t, const double S) const override; 
+
 
     float mu; 
     float sigma; 

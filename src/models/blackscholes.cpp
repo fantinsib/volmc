@@ -10,3 +10,7 @@ double BlackScholes::drift(double t, const double S) const {
 double BlackScholes::diffusion(double t, const double S) const {
     return sigma*S;
 };
+
+double BlackScholes::volatility(double t, const double S) const {
+    return sigma;
+}

@@ -25,7 +25,8 @@ public:
     double sigma(float t, float S) const {return lv_surface_->sigma(t, S);}
     double drift(double t, const double S) const override; 
     double diffusion(double t, const double S) const override;
-    
+    double volatility(double t, const double S) const override;
+
 private:
     float r_; 
     float q_;

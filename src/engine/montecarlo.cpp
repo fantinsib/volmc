@@ -13,6 +13,7 @@
 #include <sys/_types/_size_t.h>
 #include <thread>
 #include <omp.h>
+#include <utility>
 
 
 
@@ -24,16 +25,15 @@ std::vector<double> MonteCarlo::simulate_path(double S0,
                                         )
     {
     double dt = T/static_cast<double>(n);
-    std::optional<double> var0;
-    if (v0.has_value()) var0 = v0.value()*v0.value(); 
-    else var0 = std::nullopt;
-    double state = scheme_->init_state(S0, var0);
+    std::pair<double, double> state = scheme_->init_state(S0, v0);
     std::vector<double> path(n+1);
-    path[0] = state;
+    path[0] = state.first;
     
     for (size_t step = 1; step <= n; step ++){
-        double S_t = scheme_->step(S_t, step, dt, rng);
-        path[step] = S_t;
+        double S_t = state.first;
+        double v_t = state.second;
+        std::pair<double, double> state = scheme_->step(S_t, v_t, step, dt, rng);
+        path[step] = state.first;
     }
 
     return path;
@@ -43,13 +43,15 @@ std::vector<double> MonteCarlo::simulate_path(double S0,
 void MonteCarlo::generate_path_inplace(double* path, double S0, size_t n, double T, 
                                        std::mt19937& rng, std::optional<double> v0) {
     double dt = T / static_cast<double>(n);
-    double current_state = scheme_->init_state(S0, v0);
+    std::pair<double, double> state = scheme_->init_state(S0, v0);
     
-    path[0] = current_state;
+    path[0] = state.first;
     
     for (size_t step = 1; step <= n; ++step) {
-        current_state = scheme_->step(current_state, step, dt, rng);
-        path[step] = current_state;
+        double S_t = state.first;
+        double v_t = state.second;
+        std::pair<double, double> state = scheme_->step(S_t, v_t, step, dt, rng);
+        path[step] = state.first;
     }
 }
 

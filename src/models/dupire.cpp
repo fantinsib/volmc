@@ -18,3 +18,7 @@ double Dupire::diffusion(double t, const double S) const {
     return lv_surface_->sigma(t, S)*S;
 }
 
+double Dupire::volatility(double t, const double S) const {
+    return lv_surface_->sigma(t, S);
+}
+
