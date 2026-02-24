@@ -31,7 +31,7 @@ std::pair<double, double> EulerHeston::step(const double S,
                         
 {
 
-    if (dt <= 0) throw std::invalid_argument("EulerBlackScholes::step : dt must be stricltly positive");
+    if (dt <= 0) throw std::invalid_argument("EulerHeston::step : dt must be stricltly positive");
     float logS = std::log(S);    
     float V = (v*v);
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 from ._volmc import _State
 from ._volmc import _Path
 from ._volmc import _Model, _BlackScholes, _Heston, _Dupire, _Vasicek
-from ._volmc import _EulerHeston, _EulerBlackScholes, _QE, _Scheme, _EulerDupire, _Euler
+from ._volmc import _EulerHeston, _QE, _Scheme, _Euler
 from ._volmc import _MonteCarlo
 from ._volmc import _LocalVolatilitySurface
 from ._volmc import _OptionContract, _Payoff, _PutPayoff, _CallPayoff, _DigitalCallPayoff,_DigitalPutPayoff, _Instrument, _Barrier, _Direction, _Nature
@@ -203,15 +203,6 @@ class Scheme(_Scheme):
     pass
 
 
-class EulerBlackScholes(_EulerBlackScholes):
-    
-    def __init__(self, model):
-        """
-        Scheme 
-        """
-        super().__init__(model)
-
-
 class EulerHeston(_EulerHeston):
 
     def __init__(self, model):
@@ -221,9 +212,6 @@ class QE(_QE):
     def __init__(self, model, psi_c = 1.5):
         super().__init__(model, psi_c)
 
-class EulerDupire(_EulerDupire):
-    def __init__(self, model):
-        super().__init__(model)
 
 class Euler(_Euler):
     def __init__(self, model):
