@@ -576,20 +576,24 @@ class MarketState(_MarketState):
         super().__init__(S, r, v0)
 
 class Pricer(_Pricer):
-    def __init__(self, instrument : Instrument, engine : MonteCarlo):
+    def __init__(self, marketstate : MarketState, n_steps : int, n_paths : int, engine : MonteCarlo):
         """
         Pricing engine for a financial instrument.
 
         Parameters
         ----------
-        instrument : Instrument
-            The instrument to price
+        marketstate : MarketState
+            The state of the market at time of pricing
+        n_steps : int
+            The number of steps in each path
+        n_paths : int
+            The number of paths to generate
         engine : MonteCarlo
             The Monte Carlo engine to be used for pricing
         """
-        super().__init__(instrument, engine)
+        super().__init__(marketstate, n_steps, n_paths, engine)
 
-    def price(self, marketstate : MarketState, n_steps : int, n_paths : int):
+    def price(self, instrument : Instrument):
         """
         Returns the Monte Carlo simulation price
 
@@ -602,4 +606,4 @@ class Pricer(_Pricer):
         n_paths : int
             The number of path to simulate
         """
-        return self._compute_price(marketstate, n_steps, n_paths)
+        return self._compute_price(instrument)
