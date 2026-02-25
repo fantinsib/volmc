@@ -32,8 +32,9 @@ class Vasicek : public Model {
         };
 
     virtual ~Vasicek() override = default;
-    double drift(double t, const State& state) const override;
-    double diffusion(double t, const State& state) const override;
+    double drift(double t, const double S) const override;
+    double diffusion(double t, const double S) const override;
+    double volatility(double t, const double S) const override;
 
     private :
 

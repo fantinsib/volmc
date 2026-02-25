@@ -40,6 +40,7 @@ public:
 
 private:
     std::vector<State> states;
+    std::vector<double> spots; 
 };
 
 

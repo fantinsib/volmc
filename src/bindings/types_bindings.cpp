@@ -1,9 +1,11 @@
+#include <cmath>
 #include <pybind11/pybind11.h>
 #include <pybind11/pytypes.h>
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 
 #include <optional>
+#include <span>
 #include <stdexcept>
 #include "types/path.hpp"
 #include "types/simulationresult.hpp"
@@ -15,46 +17,53 @@ namespace py = pybind11;
 
 //converts a row-major array of value (spot) from simulationresult into a np.matrix
     static py::array spot_view(py::object self, const SimulationResult& res) {
-        if (!res.pathbundle) throw std::runtime_error("SimulationResult.spot_view : no reference to paths was found");
+        
+        const std::vector<double>& paths =res.get_paths();
+        if (paths.size() == 0) throw std::runtime_error("Error : no paths were found in the the SimulationResult");
 
-        const auto& b = *res.pathbundle; 
-        const ssize_t n_rows = static_cast<ssize_t>(b.n_paths);
-        const ssize_t n_cols = static_cast<ssize_t>(b.n_steps+1);
+        const ssize_t n_rows = static_cast<ssize_t>(res.get_npaths());
+        const ssize_t n_cols = static_cast<ssize_t>(res.get_nsteps()+1);
 
-        py::array_t<float> out({n_rows, n_cols});
+        py::array_t<double> out({n_rows, n_cols});
         auto r = out.mutable_unchecked<2>();
 
-        for (ssize_t p = 0; p < n_rows; ++p) {
-            ssize_t t = 0;
-            for (const State& st : b.paths[p]) {
-                r(p, t++) = st.at(0);
+    for (ssize_t i = 0; i < n_rows; ++i) {
+        const size_t offset = static_cast<size_t>(i) * static_cast<size_t>(n_cols);
+        std::span<const double> row(paths.data() + offset, static_cast<size_t>(n_cols));
+
+        ssize_t j = 0;
+        for (double st : row) {
+            r(i, j++) = st;
             }
         }
         return out;
 
     }
 
+    static py::array vol_view(py::object self, const SimulationResult& res) {
+        
+        const std::vector<double>& paths =res.get_vol();
+        if (paths.size() == 0) throw std::runtime_error("Error : no paths were found in the the SimulationResult");
 
-    static py::array var_view(py::object self, const SimulationResult& res) {
-        if (!res.pathbundle) throw std::runtime_error("SimulationResult.spot_view : no reference to paths was found");
+        const ssize_t n_rows = static_cast<ssize_t>(res.get_npaths());
+        const ssize_t n_cols = static_cast<ssize_t>(res.get_nsteps()+1);
 
-        const auto& b = *res.pathbundle; 
-        const ssize_t n_rows = static_cast<ssize_t>(b.n_paths);
-        const ssize_t n_cols = static_cast<ssize_t>(b.n_steps+1);
-
-        py::array_t<float> out({n_rows, n_cols});
+        py::array_t<double> out({n_rows, n_cols});
         auto r = out.mutable_unchecked<2>();
 
-        for (ssize_t p = 0; p < n_rows; ++p) {
-            ssize_t t = 0;
-            for (const State& st : b.paths[p]) {
-                //if (!st.vol().has_value()) throw std::runtime_error("Error : no values for volatility");
-                r(p, t++) = st.at(1);
+    for (ssize_t i = 0; i < n_rows; ++i) {
+        const size_t offset = static_cast<size_t>(i) * static_cast<size_t>(n_cols);
+        std::span<const double> row(paths.data() + offset, static_cast<size_t>(n_cols));
+
+        ssize_t j = 0;
+        for (double st : row) {
+            r(i, j++) = st;
             }
         }
         return out;
 
     }
+
 
 namespace qe::pybind {
 
@@ -78,9 +87,9 @@ void bind_types(py::module_& m) {
             const auto& r = self.cast<const SimulationResult&>();
             return spot_view(self, r);
         })
-        .def_property_readonly("var", [](py::object self) {
+        .def_property_readonly("vol", [](py::object self) {
             const auto& r = self.cast<const SimulationResult&>();
-            return var_view(self, r);
+            return vol_view(self, r);
         });
 
     }

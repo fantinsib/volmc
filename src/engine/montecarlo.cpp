@@ -5,47 +5,79 @@
 #include "engine/montecarlo.hpp"
 #include "types/simulationresult.hpp"
 #include "types/state.hpp"
+#include <memory>
 #include <optional>
 #include <random>
 #include <stdexcept>
 #include <exception>
 #include <thread>
 #include <omp.h>
+#include <utility>
+#include <vector>
 
 
 
-Path MonteCarlo::simulate_path(float S0, 
-                               size_t n, 
-                               float T,
-                               std::mt19937& rng, 
-                               std::optional<float> v0
-                               ){
-
-    float dt = T/static_cast<float>(n);
-    std::optional<double> var0;
-    if (v0.has_value()) var0 = v0.value()*v0.value(); 
-    else var0 = std::nullopt;
-    State state = scheme_->init_state(S0, var0);
-    Path path; 
-    path.set_size(static_cast<size_t>(n+1));
-    path.set_step(state, 0);
-
-    for (size_t step = 0; step < n; step ++){
-
-        state = scheme_->step(state, step, dt, rng);
-        path.set_step(state, step+1);
+std::vector<double> MonteCarlo::simulate_path(double S0, 
+                                        size_t n, 
+                                        float T,
+                                        std::mt19937& rng, 
+                                        std::optional<float> v0
+                                        )
+    {
+    double dt = T/static_cast<double>(n);
+    std::pair<double, double> state = scheme_->init_state(S0, v0);
+    std::vector<double> path(n+1);
+    path[0] = state.first;
+    
+    for (size_t step = 1; step <= n; step ++){
+        double S_t = state.first;
+        double v_t = state.second;
+        std::pair<double, double> state = scheme_->step(S_t, v_t, step, dt, rng);
+        path[step] = state.first;
     }
 
     return path;
 }
 
-SimulationResult MonteCarlo::generate(float S0, 
+
+void MonteCarlo::generate_path_inplace(double* s_path, double* v_path, double S0, size_t n, double T, 
+                                       std::mt19937& rng, std::optional<double> v0) {
+    double dt = T / static_cast<double>(n-1);
+    std::pair<double, double> state = scheme_->init_state(S0, v0);
+    
+    
+    
+    if (return_volatility_ == false){
+        s_path[0] = state.first;
+        for (size_t step = 1; step < n; ++step) {
+            double S_t = state.first;
+            double v_t = state.second;
+            state = scheme_->step(S_t, v_t, step, dt, rng);
+            s_path[step] = state.first;
+        }
+    }
+    else{
+        s_path[0] = state.first;
+        v_path[0] = state.second;
+        for (size_t step = 1; step < n; ++step) {
+            double S_t = state.first;
+            double v_t = state.second;
+            state = scheme_->step(S_t, v_t, step, dt, rng);
+            s_path[step] = state.first;
+            v_path[step] = state.second;
+        }
+        }
+}
+
+
+
+SimulationResult MonteCarlo::generate_spot(float S0, 
                                       size_t n, 
                                       float T, 
-                                      size_t n_paths, 
-                                      std::optional<float> v0){
+                                      size_t n_paths, std::optional<double> v0){
     
-    std::vector<Path> all_paths(n_paths);
+    std::vector<double> s_all_paths(n_paths*(n+1));
+    std::vector<double> v_all_paths(n_paths*(n+1));
     std::exception_ptr eptr = nullptr;
 
     std::vector<size_t> seeds_vector(n_paths);
@@ -57,7 +89,9 @@ SimulationResult MonteCarlo::generate(float S0,
     for (size_t p = 0; p < n_paths; p++){
         try {
             std::mt19937 rng(static_cast<unsigned int>(seeds_vector[p]));
-            all_paths[p] = simulate_path(S0, n, T, rng, v0);
+                double* s_path_ptr = &s_all_paths[p * (n + 1)];
+                double* v_path_ptr = &v_all_paths[p * (n + 1)];
+                generate_path_inplace( s_path_ptr, v_path_ptr, S0, n+1, T, rng, v0);
             }
         catch(...) {
             #pragma omp critical 
@@ -67,14 +101,13 @@ SimulationResult MonteCarlo::generate(float S0,
         }
     }
     if (eptr) std::rethrow_exception(eptr);
-    std::shared_ptr<PathBundle> bundle= std::make_shared<PathBundle>();
-    bundle->paths = std::move(all_paths);
-    bundle->n_paths = n_paths;
-    bundle->n_steps = n;
-    return SimulationResult{seed_, n_paths, n,bundle}; 
+
+    if (return_volatility_) return SimulationResult(std::make_shared<std::vector<double>>(s_all_paths), seed_,  n, n_paths, std::make_shared<std::vector<double>>(v_all_paths)); 
+    else return SimulationResult(std::make_shared<std::vector<double>>(s_all_paths), seed_,  n, n_paths); 
+
 }
 
-void MonteCarlo::configure(std::optional<int> seed, std::optional<int> n_jobs){
+void MonteCarlo::configure(std::optional<int> seed, std::optional<int> n_jobs, std::optional<bool> return_volatility){
 
     if (seed.has_value()) {
         if (seed.value()<0) throw std::invalid_argument("MonteCarlo::configure : seed value must be positive");
@@ -89,5 +122,9 @@ void MonteCarlo::configure(std::optional<int> seed, std::optional<int> n_jobs){
         if (n_jobs.value() < -1 || n_jobs.value() == 0) throw std::invalid_argument("MonteCarlo::configure : n_jobs value must be strictly positive or equal to -1");
         if (n_jobs.value() > hw || n_jobs.value() == -1) n_jobs_ = hw;
         else (n_jobs_ = n_jobs.value());
+    }
+
+    if (return_volatility.has_value()) {
+        return_volatility_ = return_volatility.value();
     }
 }

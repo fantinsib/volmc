@@ -1,31 +1,26 @@
 #include "schemes/euler.h"
 #include "models/model.hpp"
 #include "types/state.hpp"
+#include <utility>
 
 
 
 
-State Euler::init_state(double S0, std::optional<double> v0) const {
-    State state;
-    if (v0.has_value()) {
-        state.set(0, S0);
-        state.set(1, v0.value());
-    }
-    else state.set(0, S0);
-    
-    return state;
+std::pair<double, double> Euler::init_state(double S0, std::optional<double> v0) const {
+    if (v0.has_value()) return std::pair<double, double>(S0, v0.value());
+    else return std::pair<double, double>(S0, model_->volatility(0, S0)); 
 }
 
-State Euler::step(const State& state, int i, float dt, std::mt19937& rng) const {
-    if (dt <= 0) throw std::invalid_argument("EulerBlackScholes::step : dt must be stricltly positive");
+std::pair<double, double> Euler::step(const double S, const double v,int i, float dt, std::mt19937& rng) const {
+    if (dt <= 0) throw std::invalid_argument("Euler::step : dt must be stricltly positive");
 
     std::normal_distribution<double> dist;
-    double S = (state.at(0));
     double Z = dist(rng);
     double t = i * dt;
-    double St = S + model_->drift(t, state)*dt + model_->diffusion(t, state)*Z * std::sqrt(dt);
+    double vt = model_->volatility(t,S);
+    double St = S + model_->drift(t, S) * dt + model_->diffusion(t,S) *Z * std::sqrt(dt);
 
-    return State{St};
+    return std::pair<double, double>(St, vt);
 
 
 }

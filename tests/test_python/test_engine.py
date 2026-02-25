@@ -18,9 +18,8 @@ def test_basic_monte_carlo_euler_bs():
     assert(isinstance(sim, SimulationResult))
     assert(len(sim.spot_values()) == 10)
     assert(len(sim.spot_values()[0]) == 253)
-    
-    for v in sim.var_values()[0]: #no variance values are returned for the simulation of a BS spot process
-        assert v == 0
+
+
     for path in sim.spot_values():
         assert path[0] == 100
         assert path[-1] != 100
@@ -61,14 +60,16 @@ def test_monte_carlo_euler_heston_with_v0():
     assert(isinstance(sim, SimulationResult))
     assert(len(sim.spot_values()) == 5)
     assert(len(sim.spot_values()[0]) == 13)
-    assert(len(sim.var_values()) == 5)
-    assert(len(sim.var_values()[0]) == 13)
+
+    
+    assert(len(sim.vol_values()) == 5)
+    assert(len(sim.vol_values()[0]) == 13)
 
     for path in sim.spot_values():
         assert path[0] == 100
 
-    #ensures that the specified initial vol for Heston model is the first of the variance path
-    assert(sim.var_values()[0][0]**0.5 == pytest.approx(0.04)) 
+    #ensures that the specified initial vol for Heston model is the first of the vol path
+    assert(sim.vol_values()[0][0] == pytest.approx(0.04)) 
 
 
 def test_monte_carlo_qe_heston_with_v0():
@@ -81,10 +82,13 @@ def test_monte_carlo_qe_heston_with_v0():
     sim = montecarlo.generate(100, 8, 1, 4, 0.04)
 
     assert(isinstance(sim, SimulationResult))
+    
+    
     assert(len(sim.spot_values()) == 4)
     assert(len(sim.spot_values()[0]) == 9)
-    assert(len(sim.var_values()) == 4)
-    assert(len(sim.var_values()[0]) == 9)
+    
+    assert(len(sim.vol_values()) == 4)
+    assert(len(sim.vol_values()[0]) == 9)
 
 
 def test_monte_carlo_heston_requires_v0():

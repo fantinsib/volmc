@@ -2,7 +2,7 @@ from __future__ import annotations
 from ._volmc import _State
 from ._volmc import _Path
 from ._volmc import _Model, _BlackScholes, _Heston, _Dupire, _Vasicek
-from ._volmc import _EulerHeston, _EulerBlackScholes, _QE, _Scheme, _EulerDupire, _Euler
+from ._volmc import _EulerHeston, _QE, _Scheme, _Euler
 from ._volmc import _MonteCarlo
 from ._volmc import _LocalVolatilitySurface
 from ._volmc import _OptionContract, _Payoff, _PutPayoff, _CallPayoff, _DigitalCallPayoff,_DigitalPutPayoff, _Instrument, _Barrier, _Direction, _Nature
@@ -103,11 +103,11 @@ class SimulationResult:
         """
         return self.res.spot
     
-    def var_values(self):
+    def vol_values(self):
         """
         Returns a numpy matrix of the variance processes (one row = one process)
         """
-        return self.res.var
+        return self.res.vol
     
     def mean_terminal_spot(self):
         """
@@ -132,8 +132,18 @@ class BlackScholes(_BlackScholes):
         sigma : float 
             The volatility.
         """
+        self._mu = mu
+        self._sigma = sigma
 
         super().__init__(mu = mu, sigma = sigma)
+
+    def __str__(self):
+        return f"""
+BLACK-SCHOLES MODEL
+-------------------
+mu : {self._mu}
+sigma : {self._sigma}
+"""
 
 class Heston(_Heston):
     def __init__(self, 
@@ -159,10 +169,26 @@ class Heston(_Heston):
             Spot/Vol brownian correlation
         """
 
+        self._mu = mu
+        self._kappa = kappa
+        self._thetha = theta 
+        self._epsilon = epsilon
+        self._rho = rho
         super().__init__(mu = mu, kappa=kappa, theta=theta, epsilon=epsilon, rho=rho)
 
     def feller_condition(self):
         return self._feller_condition()
+    
+    def __str__(self):
+        return f"""
+HESTON MODEL  
+------------
+mu : {self._mu} 
+kappa : {self._kappa}
+theta : {self._thetha} 
+epsilon : {self._epsilon} 
+rho : {self._rho}
+        """
     
 class Dupire(_Dupire):
     def __init__(self, r : float, q : float, local_volatility_surface : LocalVolatilitySurface):
@@ -178,7 +204,17 @@ class Dupire(_Dupire):
         loc_vol_surface : LocalVolatilitySurface
             The local volatility surface.
         """
+        self._q = q
+        self._r = r
         super().__init__(r, q, local_volatility_surface)
+
+    def __str__(self):
+        return f"""
+DUPIRE MODEL 
+------------
+r : {self._r} 
+q : {self._q}
+"""
     
 class Vasicek(_Vasicek):
     def __init__(self, a: float, b: float, sigma: float):
@@ -194,22 +230,25 @@ class Vasicek(_Vasicek):
         sigma : float
             The volatility
         """
+        self.a = a
+        self.b = b
+        self.sigma = sigma
         super().__init__(a, b, sigma)
+
+    def __str__(self):
+        return f"""
+VASICEK MODEL 
+------------
+a : {self._a} 
+b : {self._b}
+sigma : {self._sigma}
+"""
 
 
 #--------------------------------SCHEMES
 
 class Scheme(_Scheme):
     pass
-
-
-class EulerBlackScholes(_EulerBlackScholes):
-    
-    def __init__(self, model):
-        """
-        Scheme 
-        """
-        super().__init__(model)
 
 
 class EulerHeston(_EulerHeston):
@@ -221,9 +260,6 @@ class QE(_QE):
     def __init__(self, model, psi_c = 1.5):
         super().__init__(model, psi_c)
 
-class EulerDupire(_EulerDupire):
-    def __init__(self, model):
-        super().__init__(model)
 
 class Euler(_Euler):
     def __init__(self, model):
@@ -303,7 +339,7 @@ class MonteCarlo(_MonteCarlo):
         seed : int
             The seed to be used for randomness
         """
-        self._configure(seed, n_jobs)
+        self._configure(seed, n_jobs, None)
 
 
 class LocalVolatilitySurface(_LocalVolatilitySurface):

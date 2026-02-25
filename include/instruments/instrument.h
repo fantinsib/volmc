@@ -27,7 +27,7 @@ struct Instrument {
      * @param path A path followed by the underlying asset 
      * @return double 
      */
-    double compute_payoff(const Path& path) const;
+    double compute_payoff(const std::vector<double>& path) const;
 
     /**
      * @brief Returns the payoff based on a simulation result

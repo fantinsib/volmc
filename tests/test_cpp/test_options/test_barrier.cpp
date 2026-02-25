@@ -42,7 +42,7 @@ TEST_CASE("Barrier : payoff"){
         MonteCarlo mc(euler);
         mc.configure(1, -1);
 
-        SimulationResult sim = mc.generate(S0, 100, T, 10);
+        SimulationResult sim = mc.generate_spot(S0, 100, T, 10);
 
         double payoff = up_and_in_call.compute_payoff(sim);
         REQUIRE(sim.avg_terminal_value() == Catch::Approx(S0 * std::exp(r * T)).margin(0.01));
@@ -63,7 +63,7 @@ TEST_CASE("Barrier : payoff"){
         MonteCarlo mc(euler);
         mc.configure(1, -1);
 
-        SimulationResult sim = mc.generate(S0, 100, T, 10);
+        SimulationResult sim = mc.generate_spot(S0, 100, T, 10);
 
         double payoff = up_and_in_call.compute_payoff(sim);
         REQUIRE(sim.avg_terminal_value() == Catch::Approx(S0 * std::exp(r * T)).margin(0.01));
@@ -84,7 +84,7 @@ TEST_CASE("Barrier : payoff"){
         MonteCarlo mc(euler);
         mc.configure(1, -1);
 
-        SimulationResult sim = mc.generate(100, 100, T, 10);
+        SimulationResult sim = mc.generate_spot(100, 100, T, 10);
 
         double payoff = down_and_in_put.compute_payoff(sim);
         REQUIRE(sim.avg_terminal_value() == Catch::Approx(100 * std::exp(r * T)).margin(0.01));
@@ -106,7 +106,7 @@ TEST_CASE("Barrier : payoff"){
         MonteCarlo mc(euler);
         mc.configure(1, -1);
 
-        SimulationResult sim = mc.generate(100, 100, T, 10);
+        SimulationResult sim = mc.generate_spot(100, 100, T, 10);
 
         double payoff = down_and_out_put.compute_payoff(sim);
         REQUIRE(sim.avg_terminal_value() == Catch::Approx(100 * std::exp(r * T)).margin(0.01));
@@ -130,7 +130,7 @@ TEST_CASE("Barrier : payoff"){
         MonteCarlo mc(euler);
         mc.configure(1, -1);
 
-        SimulationResult sim = mc.generate(S0, 100, T, 10);
+        SimulationResult sim = mc.generate_spot(S0, 100, T, 10);
 
         double payoff = down_and_out_put.compute_payoff(sim);
         REQUIRE(sim.avg_terminal_value() == Catch::Approx(S0 * std::exp(r * T)).margin(0.01));
@@ -162,7 +162,7 @@ TEST_CASE("Barrier : payoff dependency on H") {
     mc.configure(1, -1);
 
 
-    SimulationResult sim = mc.generate(S0, 100, T, 10);
+    SimulationResult sim = mc.generate_spot(S0, 100, T, 10);
     double payoff1 = up_out_call1.compute_payoff(sim);
     double payoff2 = up_out_call2.compute_payoff(sim);
 

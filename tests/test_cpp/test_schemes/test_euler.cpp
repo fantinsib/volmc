@@ -11,15 +11,17 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>  
+#include <cmath>
 #include <memory>
 #include <optional>
 #include <stdexcept>
+#include <utility>
+#include <vector>
 #include "engine/montecarlo.hpp"
 #include "models/black_scholes/black_scholes.hpp"
 #include "models/dupire/dupire.hpp"
 #include "models/heston/heston.hpp"
 #include "schemes/euler.h"
-#include "schemes/eulerblackscholes.hpp"
 #include "schemes/eulerheston.hpp"
 #include "surface/local_vol.hpp"
 #include "types/simulationresult.hpp"
@@ -34,18 +36,18 @@ SECTION("Constructor") {
 
     std::mt19937 rng;
     float dt = 0.1;
-    State init{100};
+    std::pair<double, double> init(100, 0.0) ;
 
-    State S{euler_bs.step(init, 0, dt, rng)};
-    REQUIRE(S.at(0));
+    std::pair<double, double> state = euler_bs.step(init.first, init.second, 0, dt, rng);
+    REQUIRE(state.first != 100);
 }
 
 SECTION("Init state") {
     BlackScholes bs{0.02, 0.2};
     Euler euler_bs(std::make_shared<BlackScholes>(bs));
 
-    State state = euler_bs.init_state(123.0f, std::nullopt);
-    REQUIRE(state.at(0) == Catch::Approx(123.0f));
+    std::pair<double, double> state = euler_bs.init_state(123.0f, std::nullopt);
+    REQUIRE(state.first == Catch::Approx(123.0f));
     //REQUIRE(state.vol().has_value() == false);
 }
 
@@ -54,10 +56,10 @@ SECTION("Invalid dt") {
     Euler euler_bs(std::make_shared<BlackScholes>(bs));
 
     std::mt19937 rng;
-    State init{100};
+    std::pair<double, double> init{100, 0.0};
 
-    REQUIRE_THROWS_AS(euler_bs.step(init, 0, 0.0f, rng), std::invalid_argument);
-    REQUIRE_THROWS_AS(euler_bs.step(init, 0, -0.1f, rng), std::invalid_argument);
+    REQUIRE_THROWS_AS(euler_bs.step(init.first, init.second, 0, 0.0f, rng), std::invalid_argument);
+    REQUIRE_THROWS_AS(euler_bs.step(init.first, init.second, 0, -0.1f, rng), std::invalid_argument);
 }
 
 SECTION("No volatility") {
@@ -67,8 +69,17 @@ SECTION("No volatility") {
     MonteCarlo engine(euler_bs);
     engine.configure(1, -1);
 
-    SimulationResult sim = engine.generate(100,100, 1.2,10);
-    REQUIRE(sim.avg_terminal_value() == Catch::Approx(100 * exp(0.02 * 1.2)));
+    size_t n_steps = 5;
+    size_t n_paths = 10;
+
+    SimulationResult sim = engine.generate_spot(100,n_steps, 1,n_paths);
+    const std::vector<double>& spots = sim.get_paths();
+    REQUIRE(spots[0] == 100);
+    REQUIRE(spots.size() == (n_steps+1)*n_paths);
+    REQUIRE(bs.volatility(10, 100) == 0.0);
+    REQUIRE(bs.diffusion(10, 100) == 0.0);
+    REQUIRE(sim.avg_terminal_value() ==
+        Catch::Approx(100.0 * std::pow(1.0 + 0.02 * (1.0 / (n_steps)), (n_steps))));
 }
 
 }
@@ -82,12 +93,12 @@ TEST_CASE("Scheme - EulerHeston") {
 
         std::mt19937 rng;
         float dt = 0.1;
-        State init{100, 0.2};
+        std::pair<double, double> init{100, 0.2};
         
-        State S = euler_heston.step(init, 0,  dt, rng);
-        REQUIRE(S.at(0) >0);
-        REQUIRE(S.at(1) >0);
-        REQUIRE(S.holds_var());
+        std::pair<double, double> state = euler_heston.step(init.first, init.second, 0,  dt, rng);
+        REQUIRE(state.first >0);
+        REQUIRE(state.first != 100.0);
+        REQUIRE(state.second >0);
 
     }
 
@@ -98,32 +109,22 @@ TEST_CASE("Scheme - EulerHeston") {
 
         std::mt19937 rng;
         float dt = 0.1;
-        State init{100};
+        std::pair<double, double> init{100, 0.0};
 
-        REQUIRE_THROWS_AS(euler_heston.step(init, 0,  dt, rng), std::invalid_argument);
+        REQUIRE_THROWS_AS(euler_heston.init_state(init.first, std::nullopt), std::invalid_argument);
 
     }
 
-    SECTION("Init state requires v0") {
-        Heston heston{0.02, 2, 0.05, 0.4, -0.5};
-        EulerHeston euler_heston{heston};
-        State init{100};
-
-        REQUIRE_THROWS_AS(euler_heston.init_state(100.0f, std::nullopt), std::invalid_argument);
-        State state = euler_heston.init_state(100.0f, 0.2f);
-        REQUIRE(state.at(0) == Catch::Approx(100.0f));
-        REQUIRE(state.at(1) > 0);
-    }
 
     SECTION("Invalid dt") {
         Heston heston{0.02, 2, 0.05, 0.4, -0.5};
         EulerHeston euler_heston{heston};
 
         std::mt19937 rng;
-        State init{100, 0.2};
+        std::pair<double, double> init{100, 0.2};
 
-        REQUIRE_THROWS_AS(euler_heston.step(init, 0, 0.0f, rng), std::invalid_argument);
-        REQUIRE_THROWS_AS(euler_heston.step(init, 0, -0.1f, rng), std::invalid_argument);
+        REQUIRE_THROWS_AS(euler_heston.step(init.first, init.second, 0, 0.0f, rng), std::invalid_argument);
+        REQUIRE_THROWS_AS(euler_heston.step(init.first, init.second, 0, -0.1f, rng), std::invalid_argument);
     }
 
 }
@@ -150,10 +151,11 @@ SECTION("Constructor") {
 
     std::mt19937 rng;
     float dt = 0.1;
-    State init{100};
+    std::pair<double, double> init{100, 0.0};
 
-    State S{euler.step(init, 0, dt, rng)};
-    REQUIRE(S.at(0));
+    std::pair<double, double> state = euler.step(init.first, init.second, 0, dt, rng);
+    REQUIRE(state.first != 100);
+    REQUIRE(state.second == surface->sigma(0, 100));
 }
 
 SECTION("Init state") {
@@ -162,8 +164,8 @@ SECTION("Init state") {
     Dupire dupire(0.03, 0.01, surface);
     Euler euler(std::make_shared<Dupire>(dupire));
 
-    State state = euler.init_state(123.0f, std::nullopt);
-    REQUIRE(state.at(0) == Catch::Approx(123.0f));
+    std::pair<double, double> state = euler.init_state(123.0f, 0.0);
+    REQUIRE(state.first == Catch::Approx(123.0f));
     //REQUIRE(state.vol().has_value() == false);
 }
 
@@ -173,9 +175,9 @@ SECTION("Invalid dt") {
     Euler euler(std::make_shared<Dupire>(dupire));
 
     std::mt19937 rng;
-    State init{100};
+    std::pair<double, double> init{100, 0.2};
 
-    REQUIRE_THROWS_AS(euler.step(init, 0, 0.0f, rng), std::invalid_argument);
-    REQUIRE_THROWS_AS(euler.step(init, 0, -0.1f, rng), std::invalid_argument);
+    REQUIRE_THROWS_AS(euler.step(init.first,init.second, 0, 0.0f, rng), std::invalid_argument);
+    REQUIRE_THROWS_AS(euler.step(init.first, init.second, 0, -0.1f, rng), std::invalid_argument);
 }
 }

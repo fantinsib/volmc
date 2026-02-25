@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <memory>
 #include <stdexcept>
+#include <span>
 
 /**
  * @brief Base class for payoffs
@@ -19,7 +20,7 @@ public:
      * @param K the strike price 
      * @return double 
      */
-    virtual double compute(Path& path, double K) const = 0;
+    virtual double compute(std::span<const double> path, double K) const = 0;
 
     virtual std::shared_ptr<Payoff> clone () const = 0;
     
@@ -42,10 +43,10 @@ public:
      * @param K the strike
      * @return double 
      */
-    double compute(Path& path, double K) const override {
+    double compute(std::span<const double> path, double K) const override {
 
         if (K<0) throw std::invalid_argument("Strike value cannot be negative");
-        double S = path.end_state().at(0);
+        double S = path.back();
         return std::max((S - K), 0.0);
     } ;
     std::shared_ptr<Payoff> clone() const override {
@@ -67,9 +68,9 @@ class PutPayoff : public Payoff {
      * @param K the strike
      * @return double 
      */
-    double compute(Path& path, double K) const override {
+    double compute(std::span<const double> path, double K) const override {
         if (K<0) throw std::invalid_argument("Strike value cannot be negative");
-        double S = path.end_state().at(0);
+        double S = path.back();
         return std::max((K - S), 0.0);
     } ;
 
@@ -94,9 +95,9 @@ class DigitalCallPayoff : public Payoff{
      * @param K the strike
      * @return double 
      */
-    double compute(Path& path, double K) const override {
+    double compute(std::span<const double> path, double K) const override {
         if (K<0) throw std::invalid_argument("Strike value cannot be negative");
-        double S = path.end_state().at(0);
+        double S = path.back();
         return (S > K) ? 1.0 : 0.0; 
     } ;
 
@@ -120,9 +121,9 @@ class DigitalPutPayoff : public Payoff{
      * @param K the strike
      * @return double 
      */
-    double compute(Path& path, double K) const override {
+    double compute(std::span<const double> path, double K) const override {
         if (K<0) throw std::invalid_argument("Strike value cannot be negative");
-        double S = path.end_state().at(0);
+        double S = path.back();
         return (S < K) ? 1.0 : 0.0; 
     } ;
 
@@ -144,13 +145,13 @@ class Barrier : public Payoff {
         nat_(nature), 
         payoff_(payoff.clone()){};
             
-        double compute(Path& path, double K) const override{
+        double compute(std::span<const double> path, double K) const override{
             bool touched = touched_(path);
             if (nat_ == In && touched) {return payoff_->compute(path, K);}
             else if (nat_ == Out && !touched) {return payoff_->compute(path, K);}
             else return 0.0;          
                 };
-        
+        bool activated = false;
     private:
         double barr_;
         Direction dir_; 
@@ -160,16 +161,16 @@ class Barrier : public Payoff {
             return std::make_shared<Barrier>(*this);
             }
         
-        bool touched_(const Path& path) const {
+        bool touched_(std::span<const double> path) const {
             
             if (dir_ == Up){
-                for (const State& p : path) {
-                    if (p.at(0) >= barr_) return true;
+                for (const auto p : path) {
+                    if (p >= barr_) return true;
                 };}
 
             if (dir_ == Down){
-                for (const State& p : path) {
-                    if (p.at(0) <= barr_) return true;
+                for (const auto p : path) {
+                    if (p <= barr_) return true;
                 };
             }
             return false;

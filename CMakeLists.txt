@@ -11,8 +11,6 @@ include(FetchContent)
 # ----------------------------
 add_library(volmc
     src/schemes/qe/qe.cpp
-    src/schemes/euler/eulerblackscholes.cpp
-    src/schemes/euler/eulerdupire.cpp
     src/schemes/euler/eulerheston.cpp
     src/schemes/euler/euler.cpp
     src/engine/montecarlo.cpp

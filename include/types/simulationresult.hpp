@@ -4,68 +4,34 @@
 #include "path.hpp"
 #include "models/model.hpp"
 #include "schemes/schemes.hpp"
+#include <optional>
 #include <stdexcept>
 #include <vector>
 #include <memory>
 
-struct PathBundle {
-
-    size_t n_paths;
-    size_t n_steps;
-    bool has_variance = false;
-
-    std::vector<Path> paths;
-
-    /**
-     * @brief Returns a vector of all the spot values
-     * in row-major order
-     * 
-     * @return std::vector<float> 
-     */
-    std::vector<float> unravel_spot(){
-
-        std::vector<float> spots;
-        for (size_t p = 0; p<n_paths; p++){
-            for (State& s : paths[p]){
-                spots.push_back(s.at(0));
-            }
-        }
-        return spots;
-    };
-
-    /**
-     * @brief Returns a vector of all the var values
-     * in row-major order
-     * 
-     * @return std::vector<float> 
-     */
-    std::vector<float> unravel_var(){
-        std::vector<float> vars;
-        for (size_t p = 0; p<n_paths; p++){
-            for (State& s : paths[p]){
-                if (!has_variance) return std::vector<float>(0);
-                vars.push_back(s.at(1));
-            }
-    }
-        return vars;
-
-}
-};
 
 /**
- * @brief Structure containing a collection of Paths and representing 
+ * @brief Structure containing the paths as row-major vectors and representing 
  * the evolution of the spot and of the variance of the process
  * 
  */
 struct SimulationResult {
 
-    size_t origin_seed;
-    size_t n_paths;
-    size_t n_steps;
 
-    size_t get_npaths() const {return n_paths;}
-    size_t get_seed() const {return origin_seed;}
-    size_t get_nsteps() const {return n_steps;}
+    /**
+     * @brief Construct a new SimulationResult object
+     * 
+     * @param paths A shared pointer to a vector containing the paths
+     * @param seed The seed used to generate the path 
+     * @param n_steps The number of steps of the generation 
+     * @param n_paths the nuùber of paths of the generation
+     */
+    SimulationResult(std::shared_ptr<std::vector<double>> paths, size_t seed,
+                    size_t n_steps, size_t n_paths, std::optional<std::shared_ptr<std::vector<double>>> v_paths = std::nullopt);
+    size_t get_npaths() const {return n_paths_;}
+    size_t get_seed() const {return origin_seed_;}
+    size_t get_nsteps() const {return n_steps_;}
+    size_t get_path_size() const {return n_steps_+1;}
 
     /**
      * @brief Returns the average final value of
@@ -73,16 +39,28 @@ struct SimulationResult {
      * 
      * @return float 
      */
-    float avg_terminal_value();
+    double avg_terminal_value();
 
-    /**
-     * @brief Returns a vector of all the Paths in the simulation
-     * 
-     * @return std::vector<Path> 
-     */
-    std::vector<Path> get_paths() const {return pathbundle->paths;}
+    const std::vector<double>& get_paths() const {
+        return *paths_;
+    }
+    const std::vector<double>& get_vol() const {
+    if (!vols_ || vols_->empty()) {
+        throw std::invalid_argument(
+            "SimulationResult : no path for volatility was generated. "
+            "Use MonteCarlo.configure to change generation settings."
+        );
+    }
+    return *vols_;
+    }
 
-    std::shared_ptr<PathBundle> pathbundle;
+
+    private :
+        std::shared_ptr<std::vector<double>> paths_;
+        std::shared_ptr<std::vector<double>> vols_;
+        const size_t origin_seed_;
+        const size_t n_paths_;
+        const size_t n_steps_;
 
 
 };

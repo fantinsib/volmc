@@ -10,9 +10,11 @@ struct Model{
     virtual ~Model() = default;
 
     // Virtual function to compute the drift given S, var
-    virtual double drift(double t, const State& state) const = 0;
+    virtual double drift(double t, const double S) const = 0;
     // Virtual function to compute the diffusion given S, var
-    virtual double diffusion(double t, const State& state) const = 0; 
+    virtual double diffusion(double t, const double S) const = 0; 
+    // Virtual function to compute the instantaneous volatility at t, S
+    virtual double volatility(double t, const double S) const = 0;
 
 };
 
