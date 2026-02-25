@@ -48,11 +48,9 @@ Schemes describe how to discretize a model at each time step.
         - `n_paths` the number of paths to generate
     - `.configure()` : use to set the seed of the engine and the `n_jobs` parameter for the number of CPU cores to use (-1 for maximum)
 - `Pricer`
-    - Take as input an `Instrument` and an `MonteCarlo`engine.
-    - `.price()` returns an Monte Carlo simulated price
-        - `MarketState` containing `S0`, `r` and optional `v0``
-        - `n_steps` The number of steps in each path
-        - `n_paths` The number of paths 
+    - Take as input a `MarketState` representing the state of the market at time of pricing, the number of steps and paths to be used for pricing and a `MonteCarlo`engine.
+        - `.price()` returns an Monte Carlo simulated price for an `Instrument`
+
 
 ### **`Options`**
 
@@ -119,17 +117,20 @@ from volmc.options import Put
 from volmc.pricing import MonteCarlo, Pricer
 from volmc.types import MarketState
 
-put_option = Put(K, T) #preset Put creation
-
 bs = BlackScholes(r, sigma)
 mc = MonteCarlo(Euler(bs))
 mc.configure(1, -1)
 
-market_state = MarketState(S0 = S, r = r)
+state = MarketState(S = S, r = r)
 
-p = Pricer(put_option, mc)
+p = Pricer(marketstate= state, 
+           n_steps = 252,
+           n_paths = 300_000,
+           engine = mc)
 
-mc_price = p.price(market_state, n_steps=252, n_paths = 300_000)
+put = Put(K, T) #preset Put creation
+
+mc_price = p.price(put)
 
 print(f"Monte Carlo estimated price : {mc_price:.4f}")
 ```
