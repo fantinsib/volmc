@@ -69,8 +69,9 @@ TEST_CASE("Pricer : construction") {
     MonteCarlo engine(euler);
     engine.configure(1, -1);
 
-    Pricer pricer(std::make_shared<Instrument>(european_call),
-                std::make_shared<MonteCarlo>(engine));
+    MarketState state(100, r);
+
+    Pricer p(state, 252, 10, std::make_shared<MonteCarlo>(engine));
     
 
 };
@@ -94,14 +95,16 @@ TEST_CASE("Pricer : basic pricing with vol = 0") {
     MonteCarlo engine(euler);
     engine.configure(1, -1);
 
-    
-    Pricer pricer(std::make_shared<Instrument>(european_call),
-                std::make_shared<MonteCarlo>(engine));
-    
 
     MarketState mstate(S0, r);
 
-    double mc_price = pricer.compute_price(mstate, 252, 10000);
+    
+    Pricer pricer(mstate, 252, 10000,
+                std::make_shared<MonteCarlo>(engine));
+    
+
+
+    double mc_price = pricer.compute_price(std::make_shared<Instrument>(european_call));
 
     double bs_price = price_bs_call(S0, K, T, sigma, r);
 
@@ -128,14 +131,14 @@ TEST_CASE("Pricer : basic pricing with volatility") {
     MonteCarlo engine(euler);
     engine.configure(1, -1);
 
-    
-    Pricer pricer(std::make_shared<Instrument>(european_put),
+    MarketState mstate(S0, r);
+    Pricer pricer(mstate, 252, 10000,
                 std::make_shared<MonteCarlo>(engine));
     
 
-    MarketState mstate(S0, r);
 
-    double mc_price = pricer.compute_price(mstate, 252, 10000);
+
+    double mc_price = pricer.compute_price(std::make_shared<Instrument>(european_put));
 
     double bs_price = price_bs_put(S0, K, T, sigma, r);
 
@@ -160,14 +163,13 @@ TEST_CASE("Pricer : delta computation") {
     MonteCarlo engine(euler);
     engine.configure(1, -1);
 
-    
-    Pricer pricer(std::make_shared<Instrument>(call),
-                std::make_shared<MonteCarlo>(engine));
-    
-
     MarketState mstate(S0, r);
+    Pricer pricer(mstate, 252, 10000, 
+                std::make_shared<MonteCarlo>(engine));
 
-    double mc_delta = pricer.compute_delta_bar(mstate, 252, 10000,1e-4);
+    
+
+    double mc_delta = pricer.compute_delta_bar(std::make_shared<Instrument>(call), 1e-4);
 
     double call_delta_val = call_delta(S0, K, T, sigma, r);
 
@@ -191,15 +193,14 @@ TEST_CASE("Pricer : delta computation with randomness") {
     MonteCarlo engine(euler);
 
     engine.configure(1, -1);
-    
-    Pricer pricer(std::make_shared<Instrument>(call),
+    MarketState mstate(S0, r);    
+    Pricer pricer(mstate, 252, 10000,
                 std::make_shared<MonteCarlo>(engine));
     
 
-    MarketState mstate(S0, r);
 
-    double mc_delta1 = pricer.compute_delta_bar(mstate, 252, 10000,1e-4);
-    double mc_delta2 = pricer.compute_delta_bar(mstate, 252, 10000,1e-4);
+    double mc_delta1 = pricer.compute_delta_bar(std::make_shared<Instrument>(call),1e-4);
+    double mc_delta2 = pricer.compute_delta_bar(std::make_shared<Instrument>(call),1e-4);
     
 
     REQUIRE(mc_delta1 == mc_delta2);
@@ -223,14 +224,13 @@ TEST_CASE("Pricer : gamma computation") {
     MonteCarlo engine(euler);
     engine.configure(1, -1);
 
-    
-    Pricer pricer(std::make_shared<Instrument>(call),
+    MarketState mstate(S0, r);
+    Pricer pricer(mstate, 252, 100000,
                 std::make_shared<MonteCarlo>(engine));
     
+    
 
-    MarketState mstate(S0, r);
-
-    double mc_gamma = pricer.compute_gamma_bar(mstate, 252, 10000,1e-1);
+    double mc_gamma = pricer.compute_gamma_bar(std::make_shared<Instrument>(call),1e-1);
 
     double call_gamma_val = gamma(S0, K, T, sigma, r);
 

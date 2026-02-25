@@ -9,9 +9,8 @@ struct MarketState {
         double spot() const {return S0_;};
         double rf_rate() const {return r_;};
         bool has_vol() const {return v0_.has_value();};
-        double vol() const {
-            if (has_vol()) return v0_.value();
-            else throw std::runtime_error("MarketState : tried to access volatility but no initial value was given");
+        std::optional<double> vol() const {
+            return v0_;
         }
 
     private:

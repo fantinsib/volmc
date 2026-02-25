@@ -11,6 +11,7 @@
 #include "engine/montecarlo.hpp"
 #include "engine/engine.hpp"
 #include <memory>
+#include <optional>
 #include <unordered_map>
 
 struct PricingResult {
@@ -25,29 +26,46 @@ struct PricingResult {
 class Pricer {
 
     public:
-    Pricer(std::shared_ptr<Instrument> instrument, std::shared_ptr<MonteCarlo> generator);
+    /**
+     * @brief Creates a pricing engine
+     * 
+     * @param marketstate the market state at the time of pricing
+     * @param n_steps the number of steps of the pricing
+     * @param n_paths the number of paths required for pricing
+     * @param generator a Monte Carlo simulator
+     */
+    Pricer(const MarketState& marketstate, 
+           size_t n_steps,
+           size_t n_paths,
+           std::shared_ptr<MonteCarlo> generator);
+
+    /**
+     * @brief Reconfigure the Pricer
+     * 
+     * @param n_steps sets a new number of steps for pricing
+     * @param n_paths sets a new number of paths for pricing
+     * @param marketstate sets a new marketstate 
+     */
+    void reconfigure(std::optional<size_t> n_steps, std::optional<size_t> n_paths, std::optional<MarketState> marketstate);
 
     /**
      * @brief Performs a Monte Carlo simulation for the instrument and returns
      * the estimated price. 
      * 
-     * @param market_state The market state containing the current spot price and the risk free rate
-     * @param n_steps The number of steps in the simulation
-     * @param n_paths The number of paths to simulate
+     * @param instrument a shared ptr to the instrument to price
      * @return double The estimated price
      */
-    double compute_price(const MarketState& market_state, int n_steps, int n_paths) const;
+    double compute_price(std::shared_ptr<Instrument> instrument) const;
     
     /**
      * @brief Performs a Monte Carlo simulation for the instrument and returns 
      * the estimated price and greeks
      * 
-     * @param market_state The market state containing the current spot price and the risk free rate
-     * @param n_steps The number of steps in the simulation
-     * @param n_paths The number of paths to simulate
+     * @param instrument a shared ptr to the instrument to price
+     * @param h The finite difference bump 
      * @return PricingResult A struct containing the price, the delta, the gamma, the theta and the vega of the option
      */
-    PricingResult compute(const MarketState& market_state, int n_steps, int n_paths);
+    PricingResult compute(std::shared_ptr<Instrument> instrument, std::optional<double> h) const;
 
 
     /**
@@ -59,7 +77,7 @@ class Pricer {
      * @param h The finite difference bump 
      * @return double 
      */
-    double compute_delta_bar(const MarketState& market_state, int n_steps, int n_paths, double h);
+    double compute_delta_bar(std::shared_ptr<Instrument> instrument, double h);
 
     /**
      * @brief Compute the gamma of the option using the bump-and-revalue technique
@@ -70,14 +88,17 @@ class Pricer {
      * @param h The finite difference bump 
      * @return double 
      */
-    double compute_gamma_bar(const MarketState& market_state, int n_steps, int n_paths, double h);
+    double compute_gamma_bar(std::shared_ptr<Instrument> instrument, double h);
     
 
     private:
+    double S0_;
+    double r_;
+    size_t n_steps_;
+    size_t n_paths_;
+    std::optional<double> v0_;
+
 
     std::shared_ptr<MonteCarlo> generator_;
-    std::shared_ptr<Instrument> instrument_;
-
-
-
+    
 };

@@ -22,12 +22,14 @@ void bind_pricer(py::module_& m){
             py::arg("v0") = py::none());
 
     py::class_<Pricer>(m, "_Pricer")
-        .def(py::init<std::shared_ptr<Instrument>, std::shared_ptr<MonteCarlo>>(),
-            py::arg("instrument"),
+        .def(py::init<MarketState, int, int, std::shared_ptr<MonteCarlo>>(),
+            py::arg("marketstate"),
+            py::arg("n_steps"),
+            py::arg("n_paths"),
             py::arg("engine"))
         .def("_compute_price", 
-            [](const Pricer& self, const MarketState& marketstate, int n_steps, int n_paths)
-            {return self.compute_price(marketstate, n_steps, n_paths);});
+            [](const Pricer& self, std::shared_ptr<Instrument> instrument)
+            {return self.compute_price(instrument);});
 
 
 }
