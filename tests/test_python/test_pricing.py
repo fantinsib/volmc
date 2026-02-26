@@ -220,7 +220,7 @@ def test_gamma():
     mc.configure(1,-1)
     engine = Pricer(MarketState(S, r),
                     252,
-                    300_000,
+                    500_000,
                     mc)
     mc_gamma = engine.gamma(put, h = 0.1)
     bs_gamma = gamma(S, K , sigma, T, r)
