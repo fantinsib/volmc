@@ -1,3 +1,3 @@
-from ._api import Pricer, MonteCarlo
+from ._api import Pricer, MonteCarlo, BlackScholesEngine, HestonEngine
 
-__all__ = ["Pricer", "MonteCarlo"]
+__all__ = ["Pricer", "MonteCarlo", "BlackScholesEngine", "HestonEngine"]

@@ -60,7 +60,7 @@ void Pricer::reconfigure(std::optional<size_t> n_steps, std::optional<size_t> n_
 
 PricingResult Pricer::compute(std::shared_ptr<Instrument> instrument, std::optional<double> h) const {};
 
-double Pricer::compute_delta_bar(std::shared_ptr<Instrument> instrument, double h) {
+double Pricer::compute_delta_bar(std::shared_ptr<Instrument> instrument, double h) const {
 
     if (h <= 0) throw std::invalid_argument("Pricer::compute_delta_bar : h must be superior to zero");
 
@@ -84,7 +84,7 @@ double Pricer::compute_delta_bar(std::shared_ptr<Instrument> instrument, double 
     
 };
 
-double Pricer::compute_gamma_bar(std::shared_ptr<Instrument> instrument, double h) {
+double Pricer::compute_gamma_bar(std::shared_ptr<Instrument> instrument, double h) const {
 
     if (h <= 0) throw std::invalid_argument("Pricer::compute_gamma_bar : h must be superior to zero");
 

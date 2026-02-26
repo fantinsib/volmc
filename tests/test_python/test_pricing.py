@@ -1,26 +1,41 @@
 from volmc.models import BlackScholes, Heston, Dupire, Vasicek
 from volmc.schemes import Euler, QE
-from volmc.pricing import MonteCarlo, Pricer
+from volmc.pricing import MonteCarlo, Pricer, BlackScholesEngine, HestonEngine
 from volmc.types import *
 from volmc.options import *
 
 import numpy as np
 import pytest
+from scipy.stats import norm
 
-def norm_cdf(x):
-    return 0.5 * (1 + np.sign(x) * np.sqrt(1 - np.exp(-2*x**2/np.pi)))
+
+def get_d1(S, K, sigma, T, r):
+    return (np.log(S/K) + ((sigma**2)/2 + r)*T)/(sigma*np.sqrt(T))
 
 def bs_call_price(S, K, sigma, T, r):
-    d1 = (np.log(S/K) + ((sigma**2)/2 + r)*T)/(sigma*np.sqrt(T))
+    d1 = get_d1(S, K, sigma, T, r)
     d2 = d1 - np.sqrt(T)*sigma
 
-    return S* norm_cdf(d1) - K*np.exp(-r*T)*norm_cdf(d2)
+    return S* norm.cdf(d1) - K*np.exp(-r*T)*norm.cdf(d2)
 
 def bs_put_price(S, K, sigma, T, r):
-    d1 = (np.log(S/K) + ((sigma**2)/2 + r)*T)/(sigma*np.sqrt(T))
+    d1 = get_d1(S, K, sigma, T, r)
     d2 = d1 - np.sqrt(T)*sigma
 
-    return -S* norm_cdf(-d1) + K*np.exp(-r*T)*norm_cdf(-d2)
+    return -S* norm.cdf(-d1) + K*np.exp(-r*T)*norm.cdf(-d2)
+
+def bs_delta_call(S, K, sigma, T, r):
+    d1 = get_d1(S, K, sigma, T, r)
+    return norm.cdf(d1)
+
+def bs_delta_put(S, K, sigma, T, r):
+    d1 = get_d1(S, K, sigma, T, r)
+    return -norm.cdf(-d1)
+
+def gamma(S, K, sigma, T, r):
+    d1 = get_d1(S, K, sigma, T, r)
+    gamma = norm.pdf(d1) / (S * sigma * np.sqrt(T))
+    return gamma
 
 def test_vanilla_pricing():
 
@@ -149,4 +164,66 @@ def test_pricing_with_dupire():
     engine = Pricer(marketstate, n_steps, n_paths, mc)
     engine.price(call)
 
+def test_delta_call_option():
 
+    S = 100
+    K = 95
+    T = 1.2
+    sigma = 0.2
+    r = 0.02
+
+    call = Call(K, T)
+
+    mc = BlackScholesEngine(r, sigma) 
+    mc.configure(1, -1)
+
+    state = MarketState(S, r)
+
+    engine = Pricer(state, 252, 100_000, mc)
+    mc_delta = engine.delta(call, 0.0001)
+    act_delta = bs_delta_call(S, K, sigma, T, r)
+    
+    assert(mc_delta == pytest.approx(act_delta, rel = 0.03))
+
+
+def test_delta_put_option():
+
+    S = 100
+    K = 95
+    T = 1.2
+    sigma = 0.2
+    r = 0.02
+
+    put = Put(K, T)
+
+    mc = BlackScholesEngine(r, sigma) 
+    mc.configure(1, -1)
+
+    state = MarketState(S, r)
+
+    engine = Pricer(state, 252, 100_000, mc)
+    mc_delta = engine.delta(put, 0.0001)
+    act_delta = bs_delta_put(S, K, sigma, T, r)
+    
+    assert(mc_delta == pytest.approx(act_delta, rel = 0.03))
+
+def test_gamma():
+
+    S = 100
+    K = 95
+    T = 1.2
+    sigma = 0.2
+    r = 0.02
+
+    put = Put(K, T)
+    mc = BlackScholesEngine(r, sigma)
+    mc.configure(1,-1)
+    engine = Pricer(MarketState(S, r),
+                    252,
+                    300_000,
+                    mc)
+    mc_gamma = engine.gamma(put, h = 0.1)
+    bs_gamma = gamma(S, K , sigma, T, r)
+
+    assert(mc_gamma == pytest.approx(bs_gamma, rel = 0.05))
+    

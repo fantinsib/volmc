@@ -77,7 +77,7 @@ class Pricer {
      * @param h The finite difference bump 
      * @return double 
      */
-    double compute_delta_bar(std::shared_ptr<Instrument> instrument, double h);
+    double compute_delta_bar(std::shared_ptr<Instrument> instrument, double h) const;
 
     /**
      * @brief Compute the gamma of the option using the bump-and-revalue technique
@@ -88,7 +88,7 @@ class Pricer {
      * @param h The finite difference bump 
      * @return double 
      */
-    double compute_gamma_bar(std::shared_ptr<Instrument> instrument, double h);
+    double compute_gamma_bar(std::shared_ptr<Instrument> instrument, double h) const;
     
 
     private:

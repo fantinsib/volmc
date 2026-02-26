@@ -557,7 +557,55 @@ def DigitalPut(K : float, T : float):
     T : float 
         The time to maturity in years
     """
-    return Instrument(OptionContract(K, T), DigitalPutPayoff()) 
+    return Instrument(OptionContract(K, T), DigitalPutPayoff())
+
+def BlackScholesEngine(mu : float, sigma : float):
+    """
+    Returns a Monte Carlo engine with a Euler discretization of BlackScholes model
+
+    Parameters
+    ----------
+    mu : float
+        The drift rate for the Black Scholes model
+    sigma : float
+        The volatility for the Black Scholes model
+    """
+    model = BlackScholes(mu, sigma)
+    scheme = Euler(model)
+    return MonteCarlo(scheme)
+
+def HestonEngine(mu : float, kappa : float, theta : float, epsilon : float, rho : float, scheme : str = "qe"):
+    """
+    Returns a Monte Carlo engine configured with a Heston model
+
+    Parameters
+    ----------
+    mu : float
+        The drift rate for the Heston model
+    kappa : float
+        The mean-reversion speed of the Heston model
+    theta : float 
+        The long-term variance of the Heston model
+    epsilon : float 
+        The vol-of-vol
+    rho : float
+        Spot/vol brownian correlation of the Heston model 
+    scheme : str
+        The scheme to use in ["qe", "euler"]
+    
+    """
+    if scheme.strip().lower() not in ["qe", "euler"]:
+        raise ValueError(f"HestonEngine : the scheme for a Heston model must be in ['qe', 'euler']. Received {scheme}")
+    
+    model = Heston(mu, kappa, theta, epsilon, rho)
+
+    if scheme == "qe":
+        return MonteCarlo(QE(model))
+    if scheme == "euler":
+        return MonteCarlo(Euler(model))
+
+
+
 
 class MarketState(_MarketState):
     def __init__(self, S: float, r: float, v0 : float | None = None):
@@ -599,11 +647,48 @@ class Pricer(_Pricer):
 
         Parameters
         ----------
-        marketstate : MarketState
-            The state of the market at pricing time
-        n_steps : int
-            the number of steps in each path
-        n_paths : int
-            The number of path to simulate
+        instrument : Instrument
+            The instrument to price
         """
         return self._compute_price(instrument)
+
+    def delta(self, instrument : Instrument, h : float):
+        """
+        Computes the delta using bump-and-revalue.
+
+        Parameters
+        ----------
+        instrument : Instrument
+            The instrument to price
+        h : float
+            The finite difference bump
+        """
+        return self._delta(instrument, h)
+    
+    def gamma(self, instrument : Instrument, h : float):
+        """
+        Computes the gamma using bump-and-revalue.
+
+        Parameters
+        ----------
+        instrument : Instrument
+            The instrument to price
+        h : float
+            The finite difference bump
+        """
+        return self._gamma(instrument, h)
+
+    def reconfigure(self, n_steps : int = None, n_paths : int = None, marketstate : MarketState = None):
+        """
+        Change the parameters of the pricing engine.
+
+        Parameters
+        ----------
+        n_steps : int
+            The number of steps to generates
+        n_paths : int 
+            The number of paths to generate
+        marketstate : MarketState
+            A marketstate
+        """
+        self._reconfigure(n_steps, n_paths, marketstate)

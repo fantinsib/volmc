@@ -29,7 +29,21 @@ void bind_pricer(py::module_& m){
             py::arg("engine"))
         .def("_compute_price", 
             [](const Pricer& self, std::shared_ptr<Instrument> instrument)
-            {return self.compute_price(instrument);});
+            {return self.compute_price(instrument);})
+        .def("_delta",
+            [] (const Pricer& self, std::shared_ptr<Instrument> instrument, double h)
+            {return self.compute_delta_bar(instrument, h);}
+        )
+        .def("_gamma", 
+            [] (const Pricer& self, std::shared_ptr<Instrument> instrument, double h)
+            {return self.compute_gamma_bar(instrument, h);}
+        )
+        .def("_reconfigure", &Pricer::reconfigure,
+            py::arg("n_steps"),
+            py::arg("n_paths"),
+            py::arg("marketstate")
+        );
+
 
 
 }

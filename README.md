@@ -47,9 +47,13 @@ Schemes describe how to discretize a model at each time step.
         - `T` the time period of generation
         - `n_paths` the number of paths to generate
     - `.configure()` : use to set the seed of the engine and the `n_jobs` parameter for the number of CPU cores to use (-1 for maximum)
+    
+    A `MonteCarlo` engine can be created either by loading a model associated with a scheme at instanciation or using pre-set engine creators. See below for examples.
 - `Pricer`
     - Take as input a `MarketState` representing the state of the market at time of pricing, the number of steps and paths to be used for pricing and a `MonteCarlo`engine.
         - `.price()` returns an Monte Carlo simulated price for an `Instrument`
+        - `.delta()` returns the simulated delta using bump and revalue technique
+        - `.gamma()` returns the simulated gamma using bump and revalue
 
 
 ### **`Options`**
@@ -65,8 +69,11 @@ Schemes describe how to discretize a model at each time step.
 
 A comprehensive demo notebook is available [here](doc/demo_notebook.ipynb).
 
+### Creating a model and simulating paths
 ```python
-from volmc import Heston, QE, MonteCarlo, SimulationResult
+from volmc.models import Heston
+from volmc.schemes import QE
+from volmc.pricing import MonteCarlo
 
 heston = Heston(mu=0.02, 
                 kappa=2, 
@@ -88,16 +95,50 @@ sim = mc.generate(S0 = 100,
 S = sim.spot_values()
 V = sim.var_values()
 ```
+```python
+#Alternatively :
+from volmc.pricing import BlackScholesEngine, HestonEngine
 
-**Output**
-
-![Spot Process](doc/img/spot_process_qe.png)
-
-![Var Process](doc/img/var_process_QE.png)
-
-## Basic Pricing Example
+mc_bs = BlackScholesEngine(mu = 0.02, sigma = 0.2)
+mc_heston = HestonEngine(mu=0.02, 
+                         kappa=2, 
+                         theta= 0.05, 
+                         epsilon=0.3, 
+                         rho = -0.6)
+mc_heston.configure(1, -1)
+mc_heston.generate(100, 0.04, 252, 1 , 500_000)
+```
+### Creating instruments
 
 ```python
+from volmc.options import *
+
+contract = OptionContract(K = 95, T = 1.2)
+call_option = Instrument(contract, CallPayoff())
+
+#Alternatively :
+call_option = Call(95, 1.2)
+put_option = Put(105, 1.2)
+```
+
+```python
+barrier_payoff = Barrier(H = 130, 
+                         direction = "up",
+                         nature = "out",
+                         payoff = CallPayoff())
+
+contract = OptionContract(110, 1.2)
+
+#Creates an up-and-out call option with barrier value 130 and strike 110 
+up_out_call = Instrument(contract, barrier_payoff)
+```
+
+
+### Pricing options
+
+```python
+#For a put option :
+
 S = 50
 K = 51
 sigma = 0.15
@@ -106,10 +147,12 @@ T = 1.2
 r= 0.02
 
 print(f"Black Scholes price : {bs_put_price(S, K, sigma, T, r):.4f}")
+print(f"Black Scholes delta : {bs_delta_put(S, K, sigma, T, r):.4f}")
 ```
 
 ```python
 Black Scholes price : 3.1635
+Black Scholes delta : -0.4571
 ```
 
 ```python
@@ -119,6 +162,8 @@ from volmc.types import MarketState
 
 bs = BlackScholes(r, sigma)
 mc = MonteCarlo(Euler(bs))
+# Alternatively :
+# mc = BlackScholesEngine(r, sigma)
 mc.configure(1, -1)
 
 state = MarketState(S = S, r = r)
@@ -131,11 +176,14 @@ p = Pricer(marketstate= state,
 put = Put(K, T) #preset Put creation
 
 mc_price = p.price(put)
+mc_delta = p.delta(put, h = 0.0001)
 
 print(f"Monte Carlo estimated price : {mc_price:.4f}")
+print(f"Monte Carlo estimated delta : {mc_delta:.4f}")
 ```
 ```python
 Monte Carlo estimated price : 3.1691
+Monte Carlo estimated delta : -0.4533
 ```
 
 The following graph shows the convergence of the price estimation depending on the number of paths generated. Red line indicates the exact Black Scholes price for this put. 
