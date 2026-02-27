@@ -68,7 +68,7 @@ def test_barrier():
     T = 1
 
     contract = OptionContract(K, T)
-    barr_payoff = Barrier(101, "up", "in", CallPayoff())
+    barr_payoff = BarrierPayoff(101, "up", "in", CallPayoff())
 
     up_in_call = Instrument(contract, barr_payoff)
 
@@ -88,10 +88,10 @@ def test_barrier_error():
     T = 1
 
     contract = OptionContract(K, T)
-    barr_payoff_ok = Barrier(101, "Up", "iN", CallPayoff())
+    barr_payoff_ok = BarrierPayoff(101, "Up", "iN", CallPayoff())
 
     with pytest.raises(ValueError):
-        Barrier(101, "in", 'out', CallPayoff())
+        BarrierPayoff(101, "in", 'out', CallPayoff())
 
 def test_barrier_payoff_dep_on_H():
     K = 120
@@ -103,8 +103,8 @@ def test_barrier_payoff_dep_on_H():
     T = 1.4
 
     contract = OptionContract(K, T)
-    barr_payoff1 = Barrier(H1, "up", "out", CallPayoff())
-    barr_payoff2 = Barrier(H2, "up", "out", CallPayoff())
+    barr_payoff1 = BarrierPayoff(H1, "up", "out", CallPayoff())
+    barr_payoff2 = BarrierPayoff(H2, "up", "out", CallPayoff())
 
     up_out_call1 = Instrument(contract, barr_payoff1)
     up_out_call2 = Instrument(contract, barr_payoff2)
@@ -130,8 +130,8 @@ def test_barrier_parity():
 
     call_price = bs_call_price(S0, K, sigma, T, r)
     contract = OptionContract(K,T)
-    up_in_pay = Barrier(H, "up", "in", CallPayoff())
-    up_out_pay = Barrier(H, "up", "out", CallPayoff())
+    up_in_pay = BarrierPayoff(H, "up", "in", CallPayoff())
+    up_out_pay = BarrierPayoff(H, "up", "out", CallPayoff())
     vanilla = Instrument(contract, CallPayoff())
     up_in = Instrument(contract, up_in_pay)
     up_out = Instrument(contract, up_out_pay)

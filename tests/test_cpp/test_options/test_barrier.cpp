@@ -19,8 +19,8 @@ TEST_CASE("Barrier : basic usage"){
     double T = 1.1;
     OptionContract contract(K,T);
     CallPayoff call_payoff; 
-    Barrier barrier(102, Up, In, call_payoff);
-    Instrument up_and_in_call(contract, std::make_unique<Barrier>(barrier));
+    BarrierPayoff barrier(102, Up, In, call_payoff);
+    Instrument up_and_in_call(contract, std::make_unique<BarrierPayoff>(barrier));
 }
 
 TEST_CASE("Barrier : payoff"){
@@ -34,8 +34,8 @@ TEST_CASE("Barrier : payoff"){
         double S0 = 101;
         OptionContract contract(K,T);
         CallPayoff call_payoff; 
-        Barrier barrier(102, Up, In, call_payoff);
-        Instrument up_and_in_call(contract, std::make_unique<Barrier>(barrier));
+        BarrierPayoff barrier(102, Up, In, call_payoff);
+        Instrument up_and_in_call(contract, std::make_unique<BarrierPayoff>(barrier));
 
         BlackScholes bs{r, 0.0000001};
         Euler euler(std::make_shared<BlackScholes>(bs));
@@ -55,8 +55,8 @@ TEST_CASE("Barrier : payoff"){
         double S0 = 101;
         OptionContract contract(K,T);
         CallPayoff call_payoff; 
-        Barrier barrier(102, Up, Out, call_payoff);
-        Instrument up_and_in_call(contract, std::make_unique<Barrier>(barrier));
+        BarrierPayoff barrier(102, Up, Out, call_payoff);
+        Instrument up_and_in_call(contract, std::make_unique<BarrierPayoff>(barrier));
 
         BlackScholes bs{r, 0}; // 0 vol to ensure constant growth 
         Euler euler(std::make_shared<BlackScholes>(bs));
@@ -76,8 +76,8 @@ TEST_CASE("Barrier : payoff"){
         float r = -0.05;
         OptionContract contract(K,T);
         PutPayoff put_payoff; 
-        Barrier barrier(99, Down, In, put_payoff);
-        Instrument down_and_in_put(contract, std::make_unique<Barrier>(barrier));
+        BarrierPayoff barrier(99, Down, In, put_payoff);
+        Instrument down_and_in_put(contract, std::make_unique<BarrierPayoff>(barrier));
 
         BlackScholes bs{r, 0}; // 0 vol to ensure constant growth 
         Euler euler(std::make_shared<BlackScholes>(bs));
@@ -98,8 +98,8 @@ TEST_CASE("Barrier : payoff"){
         float r = -0.05;
         OptionContract contract(K,T);
         PutPayoff put_payoff; 
-        Barrier barrier(99, Down, Out, put_payoff);
-        Instrument down_and_out_put(contract, std::make_unique<Barrier>(barrier));
+        BarrierPayoff barrier(99, Down, Out, put_payoff);
+        Instrument down_and_out_put(contract, std::make_unique<BarrierPayoff>(barrier));
 
         BlackScholes bs{r, 0}; // 0 vol to ensure constant growth 
         Euler euler(std::make_shared<BlackScholes>(bs));
@@ -122,8 +122,8 @@ TEST_CASE("Barrier : payoff"){
         float r = 0.05;
         OptionContract contract(K,T);
         PutPayoff call_payoff; 
-        Barrier barrier(100, Down, Out, call_payoff);
-        Instrument down_and_out_put(contract, std::make_unique<Barrier>(barrier));
+        BarrierPayoff barrier(100, Down, Out, call_payoff);
+        Instrument down_and_out_put(contract, std::make_unique<BarrierPayoff>(barrier));
 
         BlackScholes bs{r, 0}; // 0 vol to ensure constant growth 
         Euler euler(std::make_shared<BlackScholes>(bs));
@@ -150,11 +150,11 @@ TEST_CASE("Barrier : payoff dependency on H") {
     OptionContract contract(K,T);
     CallPayoff call_payoff; 
 
-    Barrier barrier1(H1, Up, Out, call_payoff);
-    Barrier barrier2(H2, Up, Out, call_payoff);
+    BarrierPayoff barrier1(H1, Up, Out, call_payoff);
+    BarrierPayoff barrier2(H2, Up, Out, call_payoff);
 
-    Instrument up_out_call1(contract, std::make_unique<Barrier>(barrier1));
-    Instrument up_out_call2(contract, std::make_unique<Barrier>(barrier2));
+    Instrument up_out_call1(contract, std::make_unique<BarrierPayoff>(barrier1));
+    Instrument up_out_call2(contract, std::make_unique<BarrierPayoff>(barrier2));
     
     BlackScholes bs{r, sigma}; // 0 vol to ensure constant growth 
     Euler euler(std::make_shared<BlackScholes>(bs));

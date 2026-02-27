@@ -45,7 +45,7 @@ void bind_options(py::module_& m){
         .value("Out", Nature::Out)
         .export_values();
 
-    py::class_<Barrier, Payoff, std::shared_ptr<Barrier>>(m, "_Barrier")
+    py::class_<BarrierPayoff, Payoff, std::shared_ptr<BarrierPayoff>>(m, "_BarrierPayoff")
         .def(py::init<double, Direction, Nature, Payoff&>(),
             py::arg("H"),
             py::arg("direction"),

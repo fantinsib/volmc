@@ -5,7 +5,7 @@ from ._volmc import _Model, _BlackScholes, _Heston, _Dupire, _Vasicek
 from ._volmc import _EulerHeston, _QE, _Scheme, _Euler
 from ._volmc import _MonteCarlo
 from ._volmc import _LocalVolatilitySurface
-from ._volmc import _OptionContract, _Payoff, _PutPayoff, _CallPayoff, _DigitalCallPayoff,_DigitalPutPayoff, _Instrument, _Barrier, _Direction, _Nature
+from ._volmc import _OptionContract, _Payoff, _PutPayoff, _CallPayoff, _DigitalCallPayoff,_DigitalPutPayoff, _Instrument, _BarrierPayoff, _Direction, _Nature
 from ._volmc import _Pricer, _MarketState
 
 from dataclasses import dataclass
@@ -478,7 +478,7 @@ class DigitalCallPayoff(_DigitalCallPayoff):
         """
         super().__init__()
 
-class Barrier(_Barrier):
+class BarrierPayoff(_BarrierPayoff):
     def __init__(self, H : float, direction : str, nature : str, payoff : Payoff):
         """
         Payoff for a barrier option

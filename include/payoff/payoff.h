@@ -137,9 +137,9 @@ class DigitalPutPayoff : public Payoff{
 enum Direction {Up, Down};
 enum Nature {In, Out};
 
-class Barrier : public Payoff {
+class BarrierPayoff : public Payoff {
     public:
-        Barrier(double H, Direction direction, Nature nature , Payoff& payoff) : 
+        BarrierPayoff(double H, Direction direction, Nature nature , Payoff& payoff) : 
         barr_(H),
         dir_(direction),
         nat_(nature), 
@@ -158,7 +158,7 @@ class Barrier : public Payoff {
         Nature nat_;
         std::shared_ptr<Payoff> payoff_;
         std::shared_ptr<Payoff> clone() const override {
-            return std::make_shared<Barrier>(*this);
+            return std::make_shared<BarrierPayoff>(*this);
             }
         
         bool touched_(std::span<const double> path) const {
@@ -176,3 +176,4 @@ class Barrier : public Payoff {
             return false;
         };
 };
+

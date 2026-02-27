@@ -52,6 +52,7 @@ Schemes describe how to discretize a model at each time step.
 - `Pricer`
     - Take as input a `MarketState` representing the state of the market at time of pricing, the number of steps and paths to be used for pricing and a `MonteCarlo`engine.
         - `.price()` returns an Monte Carlo simulated price for an `Instrument`
+        - `.batch_price()` prices a list of `Instrument` using the same simulation
         - `.delta()` returns the simulated delta using bump and revalue technique
         - `.gamma()` returns the simulated gamma using bump and revalue
 
@@ -63,7 +64,7 @@ Schemes describe how to discretize a model at each time step.
 - `PutPayoff` : European Put Payoff with payoff $\max((K-S), 0)$
 - `DigitalCallPayoff` : European Digital Call Payoff with payoff $1_{S>K}$
 - `DigitalPutPayoff` : European Digital Put Payoff with payoff $1_{K>S}$
-- `Barrier` : Barrier payoff, depending on direction, nature and barrier value
+- `BarrierPayoff` : Barrier payoff, depending on direction, nature and barrier value
 
 ## Basic Demo
 
