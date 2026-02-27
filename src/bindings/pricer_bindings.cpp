@@ -7,6 +7,7 @@
 #include <optional>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <vector>
 
 namespace py = pybind11;
 
@@ -42,6 +43,10 @@ void bind_pricer(py::module_& m){
             py::arg("n_steps"),
             py::arg("n_paths"),
             py::arg("marketstate")
+        )
+        .def("_batch_price", 
+            [] (const Pricer& self, std::vector<std::shared_ptr<Instrument>>& instruments)
+            {return self.batch_price(instruments);}
         );
 
 

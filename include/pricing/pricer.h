@@ -89,6 +89,14 @@ class Pricer {
      * @return double 
      */
     double compute_gamma_bar(std::shared_ptr<Instrument> instrument, double h) const;
+
+    /**
+     * @brief Compute the price of a series of instrument from a same simulation
+     * 
+     * @param instruments a std::vector<shared_ptr> of Instrument
+     * @return std::vector<double> 
+     */
+    std::vector<double> batch_price(std::vector<std::shared_ptr<Instrument>> instruments) const;
     
 
     private:

@@ -252,12 +252,31 @@ class Scheme(_Scheme):
 
 
 class EulerHeston(_EulerHeston):
-
     def __init__(self, model):
+        """
+        Euler discretization for Heston.
+
+        Parameters
+        ----------
+        model : Heston
+            a Heston model
+        """
+        if (isinstance(model, Heston) == False):
+            raise ValueError("QE : model must be a Heston model.")
         super().__init__(model)
 
 class QE(_QE):
     def __init__(self, model, psi_c = 1.5):
+        """
+        Quadratic-exponential discretization for Heston.
+
+        Parameters
+        ----------
+        model : Heston
+            a Heston model
+        """
+        if (isinstance(model, Heston) == False):
+            raise ValueError("QE : model must be a Heston model.")
         super().__init__(model, psi_c)
 
 
@@ -277,7 +296,14 @@ class Euler(_Euler):
 #--------------------------------Engine
 
 class MonteCarlo(_MonteCarlo):
+    """
+    Creates a Monte Carlo generator.
 
+    Parameters
+    ----------
+    scheme : Scheme
+        A discretization scheme associated with a model
+    """
     def __init__(self, scheme):
         super().__init__(scheme)
 
@@ -338,6 +364,8 @@ class MonteCarlo(_MonteCarlo):
         ----------
         seed : int
             The seed to be used for randomness
+        n_jobs : int
+            The number of CPU core to use. -1 uses all the cores available
         """
         self._configure(seed, n_jobs, None)
 
@@ -651,6 +679,17 @@ class Pricer(_Pricer):
             The instrument to price
         """
         return self._compute_price(instrument)
+    
+    def batch_price(self, instrument_list : List[Instrument]):
+        """
+        Prices a list of instrument with a unique simulation. 
+
+        Parameters
+        ----------
+        instrument_list : List[Instrument]
+            A list of instruments 
+        """
+        return self._batch_price(instrument_list)
 
     def delta(self, instrument : Instrument, h : float):
         """
@@ -692,3 +731,5 @@ class Pricer(_Pricer):
             A marketstate
         """
         self._reconfigure(n_steps, n_paths, marketstate)
+
+    

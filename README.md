@@ -185,6 +185,36 @@ print(f"Monte Carlo estimated delta : {mc_delta:.4f}")
 Monte Carlo estimated price : 3.1691
 Monte Carlo estimated delta : -0.4533
 ```
+### Batch pricing
+Price a list of options with the same simulation :
+```python
+
+#Creating a series of instruments :
+call_105 = Call(105, T)
+call_92 = Call(92, T)
+call_110 = Call(110, T)
+
+put_105 = Put(105, T)
+put_92 = Put(92, T)
+put_110 = Put(110, T)
+
+instrument_list = [call_105, call_92, call_110, put_105, put_92, put_110]
+
+#Creating an engine :
+mc = BlackScholesEngine(0.02, 0.2)
+mc.configure(1, -1)
+
+ms = MarketState(S0, r)
+
+engine = Pricer(ms, 252, 100_000, mc)
+
+#Pricing :
+prices = engine.batch_price(in_list)
+print(prices)
+```
+```bash
+[7.677609682895932, 14.418038944821866, 5.860376924775665, 10.078080185562353, 4.126795220635833, 13.14227597623177]
+```
 
 The following graph shows the convergence of the price estimation depending on the number of paths generated. Red line indicates the exact Black Scholes price for this put. 
 

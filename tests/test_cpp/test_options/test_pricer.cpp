@@ -236,3 +236,86 @@ TEST_CASE("Pricer : gamma computation") {
 
     REQUIRE(mc_gamma == Catch::Approx(call_gamma_val).epsilon(0.05));
 };
+
+
+TEST_CASE("Pricer : batch pricing") {
+
+    double S0 = 100.0;
+    double r = 0.02;
+    double sigma = 0.2;
+    double T = 1.1;
+
+    OptionContract call_102_con(102, T);
+    OptionContract call_95_con(95, T);
+    OptionContract put_105_con(105, T);
+    OptionContract put_95_con(95, T);
+
+    Instrument call_102(call_102_con, std::make_unique<CallPayoff>());
+    Instrument call_95(call_95_con, std::make_unique<CallPayoff>());
+    Instrument put_105(put_105_con, std::make_unique<PutPayoff>());
+    Instrument put_95(put_95_con, std::make_unique<PutPayoff>());
+
+    std::vector<std::shared_ptr<Instrument>> instruments{std::make_shared<Instrument>(call_102),
+                                                         std::make_shared<Instrument>(call_95),
+                                                         std::make_shared<Instrument>(put_105),
+                                                         std::make_shared<Instrument>(put_95)};
+
+    BlackScholes bs(r, sigma);
+    Euler euler(std::make_shared<BlackScholes>(bs));
+
+    MonteCarlo engine(euler);
+    engine.configure(1, -1);
+
+    MarketState mstate(S0, r);
+    Pricer pricer(mstate, 252, 100000,
+                std::make_shared<MonteCarlo>(engine));
+
+    std::vector<double> prices = pricer.batch_price(instruments);
+
+    double call_102_price = price_bs_call(S0, 102,T,  sigma,  r);
+    double call_95_price = price_bs_call(S0, 95,T,  sigma,  r);
+    double put_105_price = price_bs_put(S0, 105,T,  sigma,  r);
+    double put_95_price = price_bs_put(S0, 95,T,  sigma,  r);
+    
+    REQUIRE(prices.size() == 4);
+
+    REQUIRE(prices[0] == Catch::Approx(call_102_price).epsilon(0.05));
+    REQUIRE(prices[1] == Catch::Approx(call_95_price).epsilon(0.05));
+    REQUIRE(prices[2] == Catch::Approx(put_105_price).epsilon(0.05));
+    REQUIRE(prices[3] == Catch::Approx(put_95_price).epsilon(0.05));
+}
+
+TEST_CASE("Pricer : options with different maturities") {
+
+    double S0 = 100.0;
+    double r = 0.02;
+    double sigma = 0.2;
+    double T = 1.1;
+
+    OptionContract call_102_con(102, T);
+    OptionContract call_95_con(95, T);
+    OptionContract put_105_con(105, 1.2);
+    OptionContract put_95_con(95, T);
+
+    Instrument call_102(call_102_con, std::make_unique<CallPayoff>());
+    Instrument call_95(call_95_con, std::make_unique<CallPayoff>());
+    Instrument put_105(put_105_con, std::make_unique<PutPayoff>());
+    Instrument put_95(put_95_con, std::make_unique<PutPayoff>());
+
+    std::vector<std::shared_ptr<Instrument>> instruments{std::make_shared<Instrument>(call_102),
+                                                         std::make_shared<Instrument>(call_95),
+                                                         std::make_shared<Instrument>(put_105),
+                                                         std::make_shared<Instrument>(put_95)};
+
+    BlackScholes bs(r, sigma);
+    Euler euler(std::make_shared<BlackScholes>(bs));
+
+    MonteCarlo engine(euler);
+    engine.configure(1, -1);
+
+    MarketState mstate(S0, r);
+    Pricer pricer(mstate, 252, 100000,
+                std::make_shared<MonteCarlo>(engine));
+
+    REQUIRE_THROWS_AS(pricer.batch_price(instruments), std::invalid_argument);
+}

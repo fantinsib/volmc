@@ -60,6 +60,32 @@ void Pricer::reconfigure(std::optional<size_t> n_steps, std::optional<size_t> n_
 
 PricingResult Pricer::compute(std::shared_ptr<Instrument> instrument, std::optional<double> h) const {};
 
+std::vector<double> Pricer::batch_price(std::vector<std::shared_ptr<Instrument>> instruments) const {
+
+    if (instruments.empty()) throw std::invalid_argument("Batch price : instrument list is empty");
+
+    size_t n_instruments = instruments.size();
+    std::vector<double> prices(n_instruments);
+    double T = instruments[0]->get_maturity();
+
+    for (auto in : instruments){
+        if (in->get_maturity() != T) throw std::invalid_argument("Error : can only batch price instruments with the same maturity");
+    }
+
+    SimulationResult res = v0_.has_value() ? generator_->generate_spot(S0_,  n_steps_, T, n_paths_, v0_.value())
+        : generator_->generate_spot(S0_,  n_steps_, T, n_paths_);
+
+
+
+    for (size_t i = 0; i < n_instruments; i ++) {
+        prices[i] = instruments[i]->compute_payoff(res) *std::exp(-r_ * T);
+
+    }
+
+    return prices;
+
+}
+
 double Pricer::compute_delta_bar(std::shared_ptr<Instrument> instrument, double h) const {
 
     if (h <= 0) throw std::invalid_argument("Pricer::compute_delta_bar : h must be superior to zero");
